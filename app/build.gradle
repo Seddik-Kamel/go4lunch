@@ -53,6 +53,7 @@ dependencies {
     implementation platform('com.google.firebase:firebase-bom:29.0.3')
 
     // Test
+    androidTestImplementation 'androidx.test.espresso:espresso-intents:3.4.0'
     androidTestImplementation 'androidx.test:rules:1.4.1-alpha03'
 
 }
