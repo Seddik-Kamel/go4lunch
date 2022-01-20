@@ -5,6 +5,14 @@
       <map>
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_home_screen.xml" value="0.2625" />
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_main.xml" value="0.36302083333333335" />
+        <entry key="app/src/main/res/drawable/bottom_navigation_color.xml" value="0.2359375" />
+        <entry key="app/src/main/res/drawable/ic_baseline_map_24.xml" value="0.2359375" />
+        <entry key="app/src/main/res/layout/activity_home_screen.xml" value="0.1" />
+        <entry key="app/src/main/res/layout/list_view_restaurants_fragment.xml" value="0.1342451874366768" />
+        <entry key="app/src/main/res/layout/map_view_fragment.xml" value="0.2545289855072464" />
+        <entry key="app/src/main/res/layout/workmates_list_fragment.xml" value="0.15942028985507245" />
+        <entry key="app/src/main/res/menu-trackball/bottom_navigation_menu.xml" value="0.5275" />
+        <entry key="app/src/main/res/menu/bottom_navigation_menu.xml" value="0.21979166666666666" />
       </map>
     </option>
   </component>
