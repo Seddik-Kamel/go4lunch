@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- BOTTOM NAVIGATION VIEW -->
+    <string name="app_name">Go4Lunch</string>
+    <string name="bottom_navigation_menu_map">Carte</string>
+    <string name="bottom_navigation_menu_list">Liste</string>
+    <string name="bottom_navigation_menu_workmates">Collaborateurs</string>
+    <string name="fragment_title_map">J\'ai faim !</string>
+    <string name="fragment_title_list">J\'ai faim !</string>
+    <string name="fragment_title_workmates">Collaborateurs disponibles</string>
+</resources>

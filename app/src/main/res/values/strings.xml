@@ -1,3 +1,14 @@
 <resources>
+
+    <!-- BOTTOM NAVIGATION VIEW -->
     <string name="app_name">Go4Lunch</string>
+    <string name="bottom_navigation_menu_map">Map View </string>
+    <string name="bottom_navigation_menu_list">List View </string>
+    <string name="bottom_navigation_menu_workmates">Workmates </string>
+
+    <!-- Title fragments -->
+    <string name="fragment_title_map">I\'m Hungry !</string>
+    <string name="fragment_title_list">I\'m Hungry !</string>
+    <string name="fragment_title_workmates">"Available Workmates "</string>
+
 </resources>
