@@ -1,6 +1,7 @@
 package com.example.go4lunch.ui.activity;
 
 
+import android.app.Activity;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
@@ -16,9 +17,15 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
 
     private Bundle bundle;
 
+
     @Override
     ActivityHomeScreenBinding getViewBinding() {
         return DataBindingUtil.setContentView(this, R.layout.activity_home_screen);
+    }
+
+    @Override
+    Activity getActivity() {
+       return HomeScreenActivity.this;
     }
 
     @Override
@@ -60,6 +67,7 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
         if (getSupportActionBar() != null)
             getSupportActionBar().setTitle(title);
     }
+
 
     // Call for disable backPressed without super.onBackPressed()
     @Override

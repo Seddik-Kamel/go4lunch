@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.activity;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 
@@ -30,6 +31,11 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     @Override
+    Activity getActivity() {
+         return MainActivity.this;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setupViewModel();
@@ -44,7 +50,8 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
         if (authenticationViewModel.isCurrentUserLogged())
             startHomeActivity();
         else
-            startSignInActivity();
+         // startSignInActivity();
+        startHomeActivity();
     }
 
     private void startSignInActivity() {
