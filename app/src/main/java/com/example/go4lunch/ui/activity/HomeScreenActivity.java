@@ -8,15 +8,15 @@ import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
+
 import com.example.go4lunch.databinding.ActivityHomeScreenBinding;
 import com.example.go4lunch.ui.fragments.ListViewRestaurantsFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesListFragment;
 
-public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> {
+public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScreenBinding> {
 
     private Bundle bundle;
-
 
     @Override
     ActivityHomeScreenBinding getViewBinding() {
@@ -25,7 +25,7 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
 
     @Override
     Activity getActivity() {
-       return HomeScreenActivity.this;
+        return HomeScreenActivity.this;
     }
 
     @Override
@@ -33,7 +33,7 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
         super.onCreate(savedInstanceState);
 
         bundle = savedInstanceState;
-        configureAndShowFragment(savedInstanceState, MapViewFragment.class);
+        displayFragment(savedInstanceState, MapViewFragment.newInstance(isLocationPermissionGranted()));
         configureBottomView();
     }
 
@@ -43,17 +43,17 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
 
     private boolean updateMainFragment(int itemId) {
         if (itemId == R.id.action_map) {
-            configureAndShowFragment(bundle, MapViewFragment.class);
+            displayFragment(bundle, MapViewFragment.newInstance(isLocationPermissionGranted()));
         } else if (itemId == R.id.action_list) {
-            configureAndShowFragment(bundle, ListViewRestaurantsFragment.class);
+            displayFragment(bundle, new ListViewRestaurantsFragment());
         } else if (itemId == R.id.action_workmates) {
-            configureAndShowFragment(bundle, WorkmatesListFragment.class);
+            displayFragment(bundle, new WorkmatesListFragment());
         }
 
         return true;
     }
 
-    private void configureAndShowFragment(Bundle savedInstanceState, Class<? extends Fragment> fragment) {
+    private void displayFragment(Bundle savedInstanceState, Fragment fragment) {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
@@ -68,10 +68,8 @@ public class HomeScreenActivity extends BaseActivity<ActivityHomeScreenBinding> 
             getSupportActionBar().setTitle(title);
     }
 
-
     // Call for disable backPressed without super.onBackPressed()
     @Override
     public void onBackPressed() {
-
     }
 }

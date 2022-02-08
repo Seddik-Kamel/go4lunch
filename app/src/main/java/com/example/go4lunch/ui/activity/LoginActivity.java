@@ -18,7 +18,7 @@ import com.firebase.ui.auth.IdpResponse;
 import com.firebase.ui.auth.data.model.FirebaseAuthUIAuthenticationResult;
 import com.google.android.material.snackbar.Snackbar;
 
-public class MainActivity extends BaseActivity<ActivityMainBinding> {
+public class LoginActivity extends BaseActivity<ActivityMainBinding> {
 
     private final ActivityResultLauncher<Intent> signInLauncher = registerForActivityResult(
             new FirebaseAuthUIActivityResultContract(), this::handleResponseAfterSignIn
@@ -32,7 +32,7 @@ public class MainActivity extends BaseActivity<ActivityMainBinding> {
 
     @Override
     Activity getActivity() {
-         return MainActivity.this;
+         return LoginActivity.this;
     }
 
     @Override
