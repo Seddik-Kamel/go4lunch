@@ -1,11 +1,17 @@
 package com.example.go4lunch.ui.activity;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -25,6 +31,8 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private boolean locationPermissionGranted = false;
 
+
+
     abstract T getViewBinding();
     abstract Activity getActivity();
 
@@ -33,7 +41,7 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
         super.onCreate(savedInstanceState);
         initBinding();
         initActivity();
-        setPermissionGranted();
+        //setPermissionGranted();
     }
 
 

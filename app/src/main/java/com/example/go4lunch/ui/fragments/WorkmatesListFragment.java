@@ -22,4 +22,9 @@ public class WorkmatesListFragment extends BaseFragment {
     int getActionBarTitle() {
         return R.string.fragment_title_workmates;
     }
+
+    @Override
+    int getResourceLayout() {
+        return 0;
+    }
 }

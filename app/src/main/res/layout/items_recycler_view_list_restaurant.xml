@@ -7,18 +7,120 @@
 
     <TextView
         android:id="@+id/item_restaurant_name"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ellipsize="end"
-        android:maxLines="1"
-        android:textSize="20sp"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="2dp"
+        android:textSize="15dp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintWidth_default="percent"
-        app:layout_constraintWidth_percent="0.6"
-        tools:text="MacDonald" />
+        tools:text="Casa Nostra"
+        tools:textStyle="bold" />
 
+
+    <ImageView
+        android:id="@+id/item_restaurant_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/item_restaurant_photo"
+        android:maxWidth="80dp"
+        android:maxHeight="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:src="@tools:sample/avatars" />
+
+    <TextView
+        android:id="@+id/item_restaurant_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="3dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_restaurant_name"
+        tools:text="French - 12 rue du Faubourg Poissonnière" />
+
+    <TextView
+        android:id="@+id/item_restaurant_open"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="2dp"
+        android:layout_marginTop="5dp"
+        android:text="Ope, until 7 pm"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/item_restaurant_address"
+        tools:text="Open until pm" />
+
+    <ImageView
+        android:id="@+id/item_restaurant_people"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="2dp"
+        android:layout_marginBottom="8dp"
+        android:contentDescription="@string/item_people"
+        app:layout_constraintBottom_toTopOf="@+id/item_restaurant_stars_2"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_nbr_opinion"
+        app:srcCompat="@drawable/ic_baseline_person_24" />
+
+
+    <TextView
+        android:id="@+id/item_restaurant_nbr_opinion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/item_restaurant_stars_1"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.71000004"
+        android:text="(2)"
+        tools:text="(2)" />
+
+    <TextView
+        android:id="@+id/item_restaurant_distance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="2dp"
+        android:layout_marginEnd="8dp"
+        android:text="120 m"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
+        app:layout_constraintTop_toTopOf="parent"
+        tools:text="120m" />
+
+    <ImageView
+        android:id="@+id/item_restaurant_stars_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/item_stars"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
+        app:layout_constraintStart_toEndOf="@+id/item_restaurant_stars_2"
+        app:srcCompat="@drawable/ic_baseline_star_24" />
+
+    <ImageView
+        android:id="@+id/item_restaurant_stars_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/item_restaurant_stars_3"
+        app:srcCompat="@drawable/ic_baseline_star_24"
+        android:contentDescription="@string/item_stars" />
+
+    <ImageView
+        android:id="@+id/item_restaurant_stars_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:contentDescription="@string/item_stars"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_stars_2"
+        app:srcCompat="@drawable/ic_baseline_star_24" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

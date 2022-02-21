@@ -53,7 +53,7 @@ public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScree
         return true;
     }
 
-    private void displayFragment(Bundle savedInstanceState, Fragment fragment) {
+    public void displayFragment(Bundle savedInstanceState, Fragment fragment) {
         if (savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
                     .setReorderingAllowed(true)
@@ -61,6 +61,14 @@ public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScree
                     .addToBackStack(null)
                     .commit();
         }
+    }
+
+    public void displayFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .setReorderingAllowed(true)
+                .replace(R.id.activity_main_frame_layout, fragment, null)
+                .addToBackStack(null)
+                .commit();
     }
 
     public void setActionBarTitle(int title) {
@@ -71,5 +79,6 @@ public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScree
     // Call for disable backPressed without super.onBackPressed()
     @Override
     public void onBackPressed() {
+
     }
 }

@@ -13,6 +13,7 @@ import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.RestaurantModel;
 import com.example.go4lunch.ui.viewmodel.MapViewModel;
+import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
 import com.example.go4lunch.utils.eventBus.LocationEvent;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -34,22 +35,26 @@ public class MapViewFragment extends GoogleMapBaseFragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initializePlace();
-
+        //initializePlace();
         return super.onCreateView(inflater, container, savedInstanceState);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        if (getActivity() != null)
-            mapViewModel = new ViewModelProvider(getActivity()).get(MapViewModel.class);
+        mapViewModel = ViewModelFactory.getInstance(requireContext()).obtainViewModel(MapViewModel.class);
+        int debug = 0;
     }
 
     @Override
     public void onStart() {
         super.onStart();
         EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -64,23 +69,19 @@ public class MapViewFragment extends GoogleMapBaseFragment {
     }
 
     @Override
-    int getResourceMapView() {
-        return R.id.mapView;
-    }
-
-    @Override
-    int getResourceLayoutView() {
+    int getResourceLayout() {
         return R.layout.map_view_fragment;
     }
 
+
     @Override
-    LocationResult getLocationResult() {
+    MoveCameraFinish getMoveCameraFinish() {
         return this::showRestaurantsOnMap;
     }
 
     @Subscribe
     public void onEvent(LocationEvent locationEvent) {
-        setLocationPermissionGranted(locationEvent.locationPermissionGranted);
+      //  setLocationPermissionGranted(locationEvent.locationPermissionGranted);
         this.onMapReady(getMap());
     }
 
@@ -102,18 +103,45 @@ public class MapViewFragment extends GoogleMapBaseFragment {
         if (getMap() == null) {
             return;
         }
-        if (isLocationPermissionGranted()) {
-            FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(mapViewModel.getPlaceField());
-            @SuppressWarnings("MissingPermission") final Task<FindCurrentPlaceResponse> placeResult =
-                    placesClient.findCurrentPlace(request);
+        if (locationPermissionGranted) {
+            if (mapViewModel.lastDeviceLocation != lastKnowLocation.getLongitude()) {
+                mapViewModel.lastDeviceLocation = lastKnowLocation.getLongitude();
+                FindCurrentPlaceRequest request = FindCurrentPlaceRequest.newInstance(mapViewModel.getPlaceField());
+                @SuppressWarnings("MissingPermission") final Task<FindCurrentPlaceResponse> placeResult =
+                        placesClient.findCurrentPlace(request);
 
-            placeResult.addOnCompleteListener(task -> { // after get place
-                if (task.isSuccessful() && task.getResult() != null) {
-                    FindCurrentPlaceResponse likelyPlaces = task.getResult();
-                    mapViewModel.addRestaurantsToList(likelyPlaces);
-                    addMarkers();
-                }
-            });
+                placeResult.addOnCompleteListener(task -> { // after get place
+                    if (task.isSuccessful() && task.getResult() != null) {
+                        FindCurrentPlaceResponse likelyPlaces = task.getResult();
+                        mapViewModel.resetList();
+                        mapViewModel.addRestaurantsToList(likelyPlaces);
+                        addMarkers();
+                    }
+                });
+
+                /*final String placeId ="ChIJn84lYvhlkUcR4W4jGYMGUro";
+                final List<Place.Field> placeField = Collections.singletonList(Place.Field.OPENING_HOURS);
+                final FetchPlaceRequest request1 = FetchPlaceRequest.newInstance(placeId, placeField);*/
+
+               /* placesClient.fetchPlace(request1).addOnSuccessListener(new OnSuccessListener<FetchPlaceResponse>() {
+                    @Override
+                    public void onSuccess(FetchPlaceResponse fetchPlaceResponse) {
+                        Place place = fetchPlaceResponse.getPlace();
+                        Log.i("place", "Place found: " + place.getOpeningHours().getWeekdayText());
+                    }
+                });*/
+
+              /*  placeResult.addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.e("Place_error", e.getMessage());
+                    }
+                });*/
+
+
+            } else {
+                addMarkers();
+            }
         }
     }
 

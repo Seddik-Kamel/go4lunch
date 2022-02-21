@@ -3,16 +3,27 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="../../../../../../home/skamel/.gradle/caches/transforms-3/a0d5fd9b61fa53fc4eb30e4348592c18/transformed/jetified-firebase-ui-auth-8.0.0/res/drawable/fui_ic_phone_white_24dp.xml" value="0.2630208333333333" />
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_home_screen.xml" value="0.2625" />
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_main.xml" value="0.36302083333333335" />
+        <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2630208333333333" />
         <entry key="app/src/main/res/drawable/bottom_navigation_color.xml" value="0.2359375" />
         <entry key="app/src/main/res/drawable/ic_baseline_map_24.xml" value="0.2359375" />
+        <entry key="app/src/main/res/drawable/ic_baseline_person_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_phone_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_restaurant_menu_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_star_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_thumb_up_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_view_list_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_baseline_workmates_24.xml" value="0.2630208333333333" />
+        <entry key="app/src/main/res/drawable/ic_launcher_background.xml" value="0.2630208333333333" />
         <entry key="app/src/main/res/layout/activity_home_screen.xml" value="0.1" />
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1852355072463768" />
         <entry key="app/src/main/res/layout/activity_main_to_delete2.xml" value="0.2838541666666667" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.35507246376811596" />
-        <entry key="app/src/main/res/layout/items_recycler_view_list_restaurant.xml" value="0.25" />
-        <entry key="app/src/main/res/layout/list_view_restaurants_fragment.xml" value="0.1342451874366768" />
+        <entry key="app/src/main/res/layout/fragment_details_restaurants.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/items_recycler_view_list_restaurant.xml" value="0.36403508771929827" />
+        <entry key="app/src/main/res/layout/list_view_restaurants_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/map_view_fragment.xml" value="0.2545289855072464" />
         <entry key="app/src/main/res/layout/workmates_list_fragment.xml" value="0.15942028985507245" />
         <entry key="app/src/main/res/menu-trackball/bottom_navigation_menu.xml" value="0.5275" />

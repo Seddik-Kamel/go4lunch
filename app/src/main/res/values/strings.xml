@@ -10,5 +10,9 @@
     <string name="fragment_title_map">I\'m Hungry !</string>
     <string name="fragment_title_list">I\'m Hungry !</string>
     <string name="fragment_title_workmates">"Available Workmates "</string>
+    <string name="item_restaurant_photo">restaurant photo</string>
+    <string name="item_stars">stars</string>
+    <string name="item_people">item people</string>
+    <string name="details_restaurant_fragment"> Details Restaurant</string>
 
 </resources>

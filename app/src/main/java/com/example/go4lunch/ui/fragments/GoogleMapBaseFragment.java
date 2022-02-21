@@ -1,5 +1,12 @@
 package com.example.go4lunch.ui.fragments;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+
+import static com.example.go4lunch.ui.fragments.MapViewFragment.HUE_ORANGE;
+
+import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.os.Bundle;
 import android.util.Log;
@@ -7,84 +14,99 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
+import androidx.core.app.ActivityCompat;
 
-import com.example.go4lunch.ui.activity.HomeScreenActivity;
-import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.location.LocationServices;
+import com.example.go4lunch.R;
+import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.ui.viewmodel.MapViewModel;
+import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
+import com.example.go4lunch.usecase.NearRestaurantUpdateState;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
-import com.google.android.gms.maps.MapsInitializer;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.tasks.Task;
+import com.google.android.gms.maps.model.MarkerOptions;
 
-public abstract class GoogleMapBaseFragment extends Fragment implements OnMapReadyCallback {
+import java.util.ArrayList;
+import java.util.Objects;
 
-    interface LocationResult {
-        void makeSomethingAfterLocationResult();
+public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMapReadyCallback {
+
+    public Location lastKnowLocation;
+
+    interface MoveCameraFinish {
+        void makeSomethingAfterCameraFinishMoved();
     }
 
     private GoogleMap map;
-    private boolean locationPermissionGranted;
+
+    private MapViewModel mapViewModel;
     private static final int DEFAULT_ZOOM = 15;
-    private Location lastKnownLocation;
-    private FusedLocationProviderClient fusedLocationProviderClient;
-    private MapView mapView;
-    private int resourceMapView;
-    private int resourceLayoutView;
+
+    public MapView mapView;
+    public boolean locationPermissionGranted = false;
 
     abstract int getActionBarTitle();
-    abstract int getResourceMapView();
-    abstract int getResourceLayoutView();
-    abstract LocationResult getLocationResult();
+
+    abstract MoveCameraFinish getMoveCameraFinish();
+
 
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        locationPermissionGranted = false;
-        setActionBarTitle();
-        initResourceView();
-        initResourceMapView();
-        disableOnBackPressed();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        ///launchMap(mapView);
+        super.onViewCreated(view, savedInstanceState);
+        if (mapView != null) {
+            configureMapView(savedInstanceState);
+        }
     }
+
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(resourceLayoutView, container, false);
-        setFusedLocationProvider();
-        configureMapView(savedInstanceState, view);
-        launchMap(mapView);
-        getLocationPermissionArgument();
+        mapViewModel = ViewModelFactory.getInstance(requireContext()).obtainViewModel(MapViewModel.class);
+        mapViewModel.onLoadView();
+        View view = inflater.inflate(R.layout.map_view_fragment, container, false);
+        mapView = view.findViewById(R.id.mapView);
 
         return view;
     }
+
+    private final ActivityResultLauncher<String> permissions = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            result -> {
+                if (result && ActivityCompat.checkSelfPermission(requireActivity(), ACCESS_FINE_LOCATION)
+                        == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireActivity(), ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                    mapViewModel.onLocationPermissionsAccepted();
+                    locationPermissionGranted = true;
+                    updateLocationUi();
+                } else {
+                    Log.e("TAG", "onActivityResult: PERMISSION DENIED");
+                }
+            });
+
+    public void test(NearRestaurantUpdateState nearRestaurantUpdateState) {
+        if (nearRestaurantUpdateState != null) {
+            lastKnowLocation = Objects.requireNonNull(nearRestaurantUpdateState.getCurrentLocation());
+            //ArrayList<RestaurantModel> restaurantList = Objects.requireNonNull((nearRestaurantUpdateState).getRestaurantModelArrayList());
+            //addMarkers(restaurantList);
+            moveCameraOnPosition();
+        }
+    }
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         updateLocationUi();
-        moveCameraOnLocation(getLocationResult());
-        onMyLocationButtonClick();
-    }
+        mapViewModel.state.observe(requireActivity(), this::test);
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    private void setActionBarTitle() {
-        if (getActivity() != null)
-            ((HomeScreenActivity) getActivity()).setActionBarTitle(getActionBarTitle());
-    }
-
-    protected void disableOnBackPressed() {
-        if (getActivity() != null) getActivity().onBackPressed();
     }
 
     public GoogleMap getMap() {
@@ -95,13 +117,12 @@ public abstract class GoogleMapBaseFragment extends Fragment implements OnMapRea
         this.map = map;
     }
 
-    public boolean isLocationPermissionGranted() {
-        return locationPermissionGranted;
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        permissions.launch(ACCESS_FINE_LOCATION);
     }
 
-    public void setLocationPermissionGranted(boolean locationPermissionGranted) {
-        this.locationPermissionGranted = locationPermissionGranted;
-    }
 
     @SuppressWarnings("MissingPermission")
     public void updateLocationUi() {//UI
@@ -114,9 +135,7 @@ public abstract class GoogleMapBaseFragment extends Fragment implements OnMapRea
                 } else {
                     map.setMyLocationEnabled(false);
                     map.getUiSettings().setMyLocationButtonEnabled(false);
-                    lastKnownLocation = null;
-                    if (getActivity() != null)
-                        ((HomeScreenActivity) getActivity()).getLocationPermission();
+                    lastKnowLocation = null;
                 }
             } catch (SecurityException e) {
                 Log.e("Exception: %s", e.getMessage());
@@ -124,69 +143,29 @@ public abstract class GoogleMapBaseFragment extends Fragment implements OnMapRea
         }
     }
 
-    @SuppressWarnings("MissingPermission")
-    public void moveCameraOnLocation(LocationResult callable) {//UI
+    private void moveCameraOnPosition() {
+        if (lastKnowLocation != null) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM)
+            );
+            //moveCameraFinishCallback.makeSomethingAfterCameraFinishMoved();
 
-        try {
-            if (locationPermissionGranted) {
-                Task<Location> locationResult = fusedLocationProviderClient.getLastLocation();
-                locationResult.addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        lastKnownLocation = task.getResult();
-                        if (lastKnownLocation != null) {
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
-                                    new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude()), DEFAULT_ZOOM)
-                            );
-                            callable.makeSomethingAfterLocationResult();
-                        }
-                    }
-                });
-            }
-        } catch (SecurityException e) {
-            Log.e("Exception: %s", e.getMessage(), e);
         }
     }
 
-    private void setFusedLocationProvider() {
-        fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireActivity());
-    }
-
-    private void launchMap(MapView mapView) {//UI
-        if (getActivity() != null)
-            try {
-                if (getActivity() != null)
-                    MapsInitializer.initialize(getActivity().getApplicationContext());
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
+    private void configureMapView(@Nullable Bundle savedInstanceState) {
+        mapView.onCreate(savedInstanceState);
+        mapView.onResume();
         mapView.getMapAsync(this);
     }
 
-    private void initResourceMapView() {
-        resourceMapView = getResourceMapView();
-    }
-
-    private void initResourceView() {
-        resourceLayoutView = getResourceLayoutView();
-    }
-
-    private void configureMapView(@Nullable Bundle savedInstanceState, View view) {
-        mapView = view.findViewById(resourceMapView);
-        mapView.onCreate(savedInstanceState);
-        mapView.onResume();
-    }
-
-    public void onMyLocationButtonClick() {
-        map.setOnMyLocationButtonClickListener(() -> {
-            moveCameraOnLocation(getLocationResult());
-            return true;
-        });
-    }
-
-    private void getLocationPermissionArgument() {
-        Bundle bundle = getArguments();
-        if (bundle != null)
-            setLocationPermissionGranted(bundle.getBoolean(MapViewFragment.LOCATION_GRANTED));
+    private void addMarkers(ArrayList<RestaurantModel> restaurantList) { //UI
+        for (RestaurantModel restaurantModel : restaurantList) {
+            getMap().addMarker(new MarkerOptions()
+                    .title(restaurantModel.getName())
+                    .position(restaurantModel.getLatLng())
+                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_ORANGE))
+            );
+        }
     }
 }
