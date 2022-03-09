@@ -8,8 +8,8 @@ import java.util.ArrayList;
 
 public class NearRestaurantUpdateState {
 
-    Location currentLocation;
-    ArrayList<RestaurantModel> restaurantModelArrayList;
+    final Location currentLocation;
+    final ArrayList<RestaurantModel> restaurantModelArrayList;
 
     public NearRestaurantUpdateState(Location currentLocation, ArrayList<RestaurantModel> restaurantModelArrayList) {
         this.currentLocation = currentLocation;

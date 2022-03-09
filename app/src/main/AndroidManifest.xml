@@ -5,6 +5,7 @@
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
 
 
     <application
@@ -13,7 +14,7 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/LoginTheme">
         <activity
             android:name=".ui.activity.MainActivityToDelete2"
             android:exported="false" />
@@ -25,6 +26,11 @@
         <activity
             android:name=".ui.activity.HomeScreenActivity"
             android:exported="false" />
+
+        <activity
+            android:name=".ui.activity.RestaurantDetailActivity"
+            android:exported="false" />
+
         <activity
             android:name=".ui.activity.LoginActivity"
             android:exported="true"

@@ -2,17 +2,18 @@ package com.example.go4lunch.ui.activity;
 
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.databinding.DataBindingUtil;
 import androidx.fragment.app.Fragment;
 
 import com.example.go4lunch.R;
-
 import com.example.go4lunch.databinding.ActivityHomeScreenBinding;
 import com.example.go4lunch.ui.fragments.ListViewRestaurantsFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesListFragment;
+
 
 public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScreenBinding> {
 
@@ -69,6 +70,12 @@ public class HomeScreenActivity extends PermissionBaseActivity<ActivityHomeScree
                 .replace(R.id.activity_main_frame_layout, fragment, null)
                 .addToBackStack(null)
                 .commit();
+    }
+
+    public void startActivity(String placeId){
+        Intent intent = new Intent(this, RestaurantDetailActivity.class);
+        intent.putExtra("placeId", placeId);
+        startActivity(intent);
     }
 
     public void setActionBarTitle(int title) {

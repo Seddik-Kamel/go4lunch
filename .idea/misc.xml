@@ -4,6 +4,11 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="../../../../../../home/skamel/.gradle/caches/transforms-3/a0d5fd9b61fa53fc4eb30e4348592c18/transformed/jetified-firebase-ui-auth-8.0.0/res/drawable/fui_ic_phone_white_24dp.xml" value="0.2630208333333333" />
+        <entry key="../../../../../home/kamel/.gradle/caches/transforms-3/b7885843641497fb810d8ca689486f85/transformed/appcompat-1.4.1/res/drawable/abc_ratingbar_small_material.xml" value="0.16" />
+        <entry key="../../../../../home/kamel/Android/Sdk/platforms/android-31/data/res/drawable/ratingbar_full.xml" value="0.16" />
+        <entry key="../../../../../home/kamel/Android/Sdk/platforms/android-31/data/res/drawable/ratingbar_small.xml" value="0.1435" />
+        <entry key="../../../../../home/kamel/Android/Sdk/platforms/android-31/data/res/drawable/ratingbar_small_holo_dark.xml" value="0.1435" />
+        <entry key="../../../../../layout/custom_preview.xml" value="0.31875" />
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_home_screen.xml" value="0.2625" />
         <entry key="..\:/Users/seddi/projets/Projets Android/Go4Lunch/app/src/main/res/layout/activity_main.xml" value="0.36302083333333335" />
         <entry key="app/src/main/res/drawable-v24/ic_launcher_foreground.xml" value="0.2630208333333333" />
@@ -21,7 +26,7 @@
         <entry key="app/src/main/res/layout/activity_main.xml" value="0.1852355072463768" />
         <entry key="app/src/main/res/layout/activity_main_to_delete2.xml" value="0.2838541666666667" />
         <entry key="app/src/main/res/layout/fragment_blank.xml" value="0.35507246376811596" />
-        <entry key="app/src/main/res/layout/fragment_details_restaurants.xml" value="0.33" />
+        <entry key="app/src/main/res/layout/fragment_details_restaurants.xml" value="0.1" />
         <entry key="app/src/main/res/layout/items_recycler_view_list_restaurant.xml" value="0.36403508771929827" />
         <entry key="app/src/main/res/layout/list_view_restaurants_fragment.xml" value="0.25" />
         <entry key="app/src/main/res/layout/map_view_fragment.xml" value="0.2545289855072464" />

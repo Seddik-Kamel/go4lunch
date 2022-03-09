@@ -15,7 +15,6 @@ import com.google.android.material.snackbar.Snackbar;
 public class MainActivityToDelete2 extends AppCompatActivity {
 
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted;
     private View mLayout;
 
     @Override
@@ -25,12 +24,7 @@ public class MainActivityToDelete2 extends AppCompatActivity {
         mLayout = findViewById(R.id.main_layout);
 
         // Register a listener for the 'Show Camera Preview' button.
-        findViewById(R.id.button2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                launch();
-            }
-        });
+        findViewById(R.id.button2).setOnClickListener(view -> launch());
 
     }
 
@@ -38,13 +32,7 @@ public class MainActivityToDelete2 extends AppCompatActivity {
         if(ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)){
 
             Snackbar.make(mLayout, "Location access...",
-                    Snackbar.LENGTH_INDEFINITE).setAction("ok", new View.OnClickListener() {
-
-                @Override
-                public void onClick(View v) {
-                    ActivityCompat.requestPermissions(MainActivityToDelete2.this ,new  String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-                }
-            }).show();
+                    Snackbar.LENGTH_INDEFINITE).setAction("ok", v -> ActivityCompat.requestPermissions(MainActivityToDelete2.this ,new  String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION)).show();
         } else {
 
             Snackbar.make(mLayout, "else", Snackbar.LENGTH_SHORT).show();
@@ -57,11 +45,12 @@ public class MainActivityToDelete2 extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         // BEGIN_INCLUDE(onRequestPermissionsResult)
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION) {
             // Request for camera permission.
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // Permission has been granted. Start camera preview Activity.
-                Snackbar.make(mLayout,"grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED",
+                Snackbar.make(mLayout, "grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED",
                         Snackbar.LENGTH_SHORT)
                         .show();
                 //startCamera();

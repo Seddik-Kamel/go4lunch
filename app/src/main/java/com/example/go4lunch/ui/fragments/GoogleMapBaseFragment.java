@@ -2,7 +2,6 @@ package com.example.go4lunch.ui.fragments;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-
 import static com.example.go4lunch.ui.fragments.MapViewFragment.HUE_ORANGE;
 
 import android.content.Context;
@@ -39,13 +38,7 @@ import java.util.Objects;
 public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMapReadyCallback {
 
     public Location lastKnowLocation;
-
-    interface MoveCameraFinish {
-        void makeSomethingAfterCameraFinishMoved();
-    }
-
     private GoogleMap map;
-
     private MapViewModel mapViewModel;
     private static final int DEFAULT_ZOOM = 15;
 
@@ -54,23 +47,18 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
 
     abstract int getActionBarTitle();
 
-    abstract MoveCameraFinish getMoveCameraFinish();
-
-
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        ///launchMap(mapView);
         super.onViewCreated(view, savedInstanceState);
         if (mapView != null) {
             configureMapView(savedInstanceState);
         }
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mapViewModel = ViewModelFactory.getInstance(requireContext()).obtainViewModel(MapViewModel.class);
+        mapViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(MapViewModel.class);
         mapViewModel.onLoadView();
         View view = inflater.inflate(R.layout.map_view_fragment, container, false);
         mapView = view.findViewById(R.id.mapView);
@@ -91,30 +79,23 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
                 }
             });
 
-    public void test(NearRestaurantUpdateState nearRestaurantUpdateState) {
+    public void render(NearRestaurantUpdateState nearRestaurantUpdateState) {
         if (nearRestaurantUpdateState != null) {
             lastKnowLocation = Objects.requireNonNull(nearRestaurantUpdateState.getCurrentLocation());
-            //ArrayList<RestaurantModel> restaurantList = Objects.requireNonNull((nearRestaurantUpdateState).getRestaurantModelArrayList());
-            //addMarkers(restaurantList);
+            mapViewModel.setRestaurantList(Objects.requireNonNull((nearRestaurantUpdateState).getRestaurantModelArrayList()));
             moveCameraOnPosition();
         }
     }
-
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         updateLocationUi();
-        mapViewModel.state.observe(requireActivity(), this::test);
-
+        mapViewModel.state.observe(requireActivity(), this::render);
     }
 
     public GoogleMap getMap() {
         return map;
-    }
-
-    public void setMap(GoogleMap map) {
-        this.map = map;
     }
 
     @Override
@@ -123,6 +104,11 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         permissions.launch(ACCESS_FINE_LOCATION);
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        mapViewModel.stopLocationUpdate();
+    }
 
     @SuppressWarnings("MissingPermission")
     public void updateLocationUi() {//UI
@@ -148,8 +134,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM)
             );
-            //moveCameraFinishCallback.makeSomethingAfterCameraFinishMoved();
-
+            addMarkers(mapViewModel.getRestaurantList());
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.go4lunch.ui.viewmodel;
 
+import android.app.Application;
 import android.content.Context;
 
 import androidx.annotation.NonNull;
@@ -32,12 +33,12 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
 
-    public static ViewModelFactory getInstance(Context context) {
+    public static ViewModelFactory getInstance(Context context, Application application) {
         if (viewModelFactory == null) {
             synchronized (ViewModelFactory.class) {
                 if (viewModelFactory == null) {
                     locationRepository = LocationRepository.getInstance(context);
-                    placeRepository = PlaceRepository.getInstance(context);
+                    placeRepository = PlaceRepository.getInstance(context, application, locationRepository);
                     viewModelFactory = new ViewModelFactory(locationRepository);
                 }
             }

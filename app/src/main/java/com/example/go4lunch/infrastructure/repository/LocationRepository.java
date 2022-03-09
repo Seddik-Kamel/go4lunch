@@ -21,13 +21,15 @@ import com.google.android.gms.location.LocationServices;
 public class LocationRepository extends LiveData<Location> {
 
     private static LocationRepository mLocationFactory = null;
-    private Context context;
+    private final Context context;
     private final FusedLocationProviderClient fusedLocationProviderClient;
     private final LocationRequest mLocationRequest;
+    private Location currentLocation;
     private final LocationCallback locationUpdateCallback = new LocationCallback() {
         @Override
         public void onLocationResult(@NonNull LocationResult locationResult) {
             super.onLocationResult(locationResult);
+            setCurrentLocation(locationResult.getLastLocation());
             setValue(locationResult.getLastLocation());
         }
     };
@@ -37,8 +39,8 @@ public class LocationRepository extends LiveData<Location> {
         this.context = context.getApplicationContext();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationRequest = LocationRequest.create()
-                .setInterval(20000)
-                .setFastestInterval(3000)
+                .setInterval(60000)
+                .setFastestInterval(60000)
                 .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
                 .setMaxWaitTime(100);
     }
@@ -81,9 +83,21 @@ public class LocationRepository extends LiveData<Location> {
     @RequiresPermission(
             anyOf = {"android.permission.ACCESS_FINE_LOCATION"}
     )
+
     private void findLocation() {
-        Looper looper = Looper.myLooper();
+        Looper looper = Looper.getMainLooper();
         fusedLocationProviderClient.requestLocationUpdates(mLocationRequest, locationUpdateCallback, looper);
     }
 
+    public void stopLocationUpdate(){
+        fusedLocationProviderClient.removeLocationUpdates(locationUpdateCallback);
+    }
+
+    public Location getCurrentLocation() {
+        return currentLocation;
+    }
+
+    public void setCurrentLocation(Location currentLocation) {
+        this.currentLocation = currentLocation;
+    }
 }

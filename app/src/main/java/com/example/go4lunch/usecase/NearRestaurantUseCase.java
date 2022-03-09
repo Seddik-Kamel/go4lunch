@@ -7,6 +7,7 @@ import androidx.lifecycle.MediatorLiveData;
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
 import com.example.go4lunch.model.RestaurantModel;
+import com.google.android.libraries.places.api.net.PlacesClient;
 
 import java.util.ArrayList;
 
@@ -16,12 +17,14 @@ public class NearRestaurantUseCase extends MediatorLiveData<NearRestaurantUpdate
     private Location currentLocation;
     private ArrayList<RestaurantModel> restaurantModelArrayList;
     private final LocationRepository locationRepository;
+    private final PlaceRepository placeRepository;
 
     public NearRestaurantUseCase(LocationRepository locationRepository, PlaceRepository placeRepository) {
         this.locationRepository = locationRepository;
+        this.placeRepository = placeRepository;
 
-        addSource(locationRepository,(source) -> {
-            if(currentLocation != source){
+        addSource(locationRepository, (source) -> {
+            if (currentLocation != source) {
                 currentLocation = source;
                 placeRepository.findPlace();
                 notifyObserver();
@@ -36,12 +39,22 @@ public class NearRestaurantUseCase extends MediatorLiveData<NearRestaurantUpdate
         });
     }
 
-    public void notifyObserver(){
-        if(currentLocation != null/* && restaurantModelArrayList != null*/)
+    public void notifyObserver() {
+        if (currentLocation != null && restaurantModelArrayList != null)
             setValue(new NearRestaurantUpdateState(currentLocation, restaurantModelArrayList));
     }
 
-    public void startService(){
+
+
+    public void startService() {
         locationRepository.startService();
+    }
+
+    public PlacesClient getPlacesClient() {
+        return placeRepository.getPlacesClient();
+    }
+
+    public void stopLocationUpdate(){
+        locationRepository.stopLocationUpdate();
     }
 }

@@ -9,4 +9,13 @@
     <string name="fragment_title_map">J\'ai faim !</string>
     <string name="fragment_title_list">J\'ai faim !</string>
     <string name="fragment_title_workmates">Collaborateurs disponibles</string>
+    <string name="place_open">Ouvert</string>
+    <string name="place_close">Fermé</string>
+    <string name="unknown_information">N.C</string>
+    <string name="details_restaurant_fragment">Détail d\'un restaurant</string>
+    <string name="item_restaurant_photo">"Photo d'un restaurant "</string>
+    <string name="item_stars">Etoile</string>
+    <string name="item_people">Personnes</string>
+    <string name="description_like_button">Bouton aime</string>
+
 </resources>

@@ -38,40 +38,6 @@ public class MainActivity_instru_Test {
         assertThat(mainActivity, notNullValue());
     }
 
-    @Test
-    public void mainActivity_instru_Test() {// si l'usager est authentifer on test si l'activité d'auth est lance
-
-
-       // MainActivity mainActivity = mActivityTestRule.getActivity();
-
-/*
-        ViewInteraction materialButton = onView(
-                allOf(withText("Sign in with Google"),
-                        childAtPosition(
-                                allOf(withId(R.id.btn_holder),
-                                        childAtPosition(
-                                                withId(R.id.container),
-                                                0)),
-                                0)));
-        materialButton.perform(scrollTo(), click());
-
-
-
-        onView(ViewMatchers.withId(R.layout.activity_home_screen)).check(matches(isDisplayed()));
-
-        ViewInteraction appCompatButton = onView(
-                allOf(withId(R.id.sign_out), withText("Sign out"),
-                        childAtPosition(
-                                childAtPosition(
-                                        withId(android.R.id.content),
-                                        0),
-                                0),
-                        isDisplayed()));
-        appCompatButton.perform(click());
-
-        onView(ViewMatchers.withId(R.layout.activity_main)).check(matches(isDisplayed()));*/
-    }
-
 
     private static Matcher<View> childAtPosition(
             final Matcher<View> parentMatcher, final int position) {

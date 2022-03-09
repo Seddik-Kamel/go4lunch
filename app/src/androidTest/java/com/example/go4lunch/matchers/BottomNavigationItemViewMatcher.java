@@ -10,6 +10,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationItemView;
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 
+import java.util.Objects;
+
 /**
  * Created by Philippe from OC on 29/03/2018.
  */
@@ -34,7 +36,7 @@ public final class BottomNavigationItemViewMatcher {
             @Override
             protected boolean matchesSafely(BottomNavigationItemView item) {
                 triedMatching = true;
-                return item.getItemData().isChecked() == isChecked;
+                return Objects.requireNonNull(item.getItemData()).isChecked() == isChecked;
             }
         };
     }
@@ -56,7 +58,7 @@ public final class BottomNavigationItemViewMatcher {
             @Override
             protected boolean matchesSafely(BottomNavigationItemView item) {
                 this.triedMatching = true;
-                this.title = item.getItemData().getTitle().toString();
+                this.title = Objects.requireNonNull(item.getItemData()).getTitle().toString();
                 return title.equals(titleTested);
             }
         };

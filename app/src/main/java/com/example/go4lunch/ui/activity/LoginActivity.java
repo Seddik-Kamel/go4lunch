@@ -26,7 +26,7 @@ public class LoginActivity extends BaseActivity<ActivityMainBinding> {
     AuthenticationViewModel authenticationViewModel;
 
     @Override
-    ActivityMainBinding getViewBinding() {
+    public ActivityMainBinding getViewBinding() {
         return DataBindingUtil.setContentView(this, R.layout.activity_main);
     }
 

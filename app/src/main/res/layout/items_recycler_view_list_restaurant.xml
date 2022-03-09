@@ -9,10 +9,12 @@
         android:id="@+id/item_restaurant_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="2dp"
-        android:textSize="15dp"
+        android:maxEms="10"
+        android:textSize="16sp"
         android:textStyle="bold"
+        android:textColor="@color/quantum_grey"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="Casa Nostra"
@@ -21,14 +23,12 @@
 
     <ImageView
         android:id="@+id/item_restaurant_image"
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="8dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="5dp"
+        android:layout_marginBottom="5dp"
         android:contentDescription="@string/item_restaurant_photo"
-        android:maxWidth="80dp"
-        android:maxHeight="80dp"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
@@ -38,8 +38,10 @@
         android:id="@+id/item_restaurant_address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="3dp"
+        android:maxEms="15"
+        android:textColor="@color/quantum_grey"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_restaurant_name"
         tools:text="French - 12 rue du Faubourg Poissonnière" />
@@ -48,37 +50,14 @@
         android:id="@+id/item_restaurant_open"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="2dp"
-        android:layout_marginTop="5dp"
-        android:text="Ope, until 7 pm"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:textSize="15sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/item_restaurant_address"
-        tools:text="Open until pm" />
+        tools:text="Open" />
 
-    <ImageView
-        android:id="@+id/item_restaurant_people"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="2dp"
-        android:layout_marginBottom="8dp"
-        android:contentDescription="@string/item_people"
-        app:layout_constraintBottom_toTopOf="@+id/item_restaurant_stars_2"
-        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_nbr_opinion"
-        app:srcCompat="@drawable/ic_baseline_person_24" />
-
-
-    <TextView
-        android:id="@+id/item_restaurant_nbr_opinion"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        app:layout_constraintBottom_toTopOf="@+id/item_restaurant_stars_1"
-        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.71000004"
-        android:text="(2)"
-        tools:text="(2)" />
 
     <TextView
         android:id="@+id/item_restaurant_distance"
@@ -86,41 +65,34 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
-        android:text="120 m"
+        android:textColor="@color/quantum_grey"
         app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="120m" />
 
-    <ImageView
-        android:id="@+id/item_restaurant_stars_1"
+    <RatingBar
+        android:id="@+id/restaurant_ratingBar"
+        style="@android:style/Widget.Holo.RatingBar.Small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
         android:layout_marginEnd="8dp"
-        android:contentDescription="@string/item_stars"
+        android:clickable="false"
+        android:isIndicator="true"
+        android:max="5"
+        android:maxWidth="5dp"
+        android:stepSize="0.1"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_user_rating_total"
+        tools:rating="1.9" />
+
+    <TextView
+        android:id="@+id/item_restaurant_user_rating_total"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:textColor="@color/quantum_grey"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
-        app:layout_constraintStart_toEndOf="@+id/item_restaurant_stars_2"
-        app:srcCompat="@drawable/ic_baseline_star_24" />
-
-    <ImageView
-        android:id="@+id/item_restaurant_stars_2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/item_restaurant_stars_3"
-        app:srcCompat="@drawable/ic_baseline_star_24"
-        android:contentDescription="@string/item_stars" />
-
-    <ImageView
-        android:id="@+id/item_restaurant_stars_3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
-        android:contentDescription="@string/item_stars"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_stars_2"
-        app:srcCompat="@drawable/ic_baseline_star_24" />
+        tools:text="(2)" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

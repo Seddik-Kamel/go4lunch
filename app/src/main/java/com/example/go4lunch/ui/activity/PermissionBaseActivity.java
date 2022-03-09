@@ -1,21 +1,13 @@
 package com.example.go4lunch.ui.activity;
 
-import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
-import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-
-import android.Manifest;
 import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.viewbinding.ViewBinding;
 
 import com.example.go4lunch.utils.eventBus.LocationEvent;
@@ -29,7 +21,7 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
     protected T binding;
     protected Activity activity;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
-    private boolean locationPermissionGranted = false;
+    private final boolean locationPermissionGranted = false;
 
 
 
@@ -70,31 +62,6 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
         }
     }
 
-    public void getLocationPermission() {
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
-
-            //TODO
-            Snackbar.make(view, "Texte à modifier",
-                    Snackbar.LENGTH_INDEFINITE).setAction("ok", v -> launchRequestPermission()).show();
-        } else {
-            //TODO
-            Snackbar.make(view, "Texte à modifier", Snackbar.LENGTH_SHORT).show();
-            launchRequestPermission();
-        }
-    }
-
-    private void launchRequestPermission() {
-        ActivityCompat.requestPermissions(activity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
-    }
-
-    private void setPermissionGranted() { // Permission
-        if (getActivity() != null)
-            if (ActivityCompat.checkSelfPermission(getActivity(), Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED)
-                locationPermissionGranted = true;
-            else
-                ((HomeScreenActivity) getActivity()).getLocationPermission();
-    }
-
     private void initBinding() {
         binding = getViewBinding();
         view = binding.getRoot();
@@ -109,7 +76,4 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
         return locationPermissionGranted;
     }
 
-    public void setLocationPermissionGranted(boolean locationPermissionGranted) {
-        this.locationPermissionGranted = locationPermissionGranted;
-    }
 }

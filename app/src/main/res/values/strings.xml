@@ -12,7 +12,11 @@
     <string name="fragment_title_workmates">"Available Workmates "</string>
     <string name="item_restaurant_photo">restaurant photo</string>
     <string name="item_stars">stars</string>
-    <string name="item_people">item people</string>
-    <string name="details_restaurant_fragment"> Details Restaurant</string>
+    <string name="item_people">item peoples</string>
+    <string name="details_restaurant_fragment">" Restaurant  Details"</string>
+    <string name="place_open" >Open</string>
+    <string name="place_close" >Closed</string>
+    <string name="unknown_information">U.W</string>
+    <string name="description_like_button">Like button</string>
 
 </resources>
