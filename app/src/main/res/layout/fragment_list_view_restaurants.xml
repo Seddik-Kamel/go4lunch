@@ -7,13 +7,28 @@
     android:layout_height="match_parent"
     tools:context=".ui.fragments.ListViewRestaurantsFragment">
 
+<!--    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        app:cardCornerRadius="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">-->
+
+
+    <!--</androidx.cardview.widget.CardView>-->
+
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/list_restaurant"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
+
         app:layout_constraintTop_toTopOf="parent"
         tools:context=".ui.activity.HomeScreenActivity"
         tools:listitem="@layout/items_recycler_view_list_restaurant" />

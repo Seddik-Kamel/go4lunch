@@ -9,12 +9,15 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
+import com.example.go4lunch.infrastructure.repository.WorkmateRepository;
 import com.example.go4lunch.usecase.NearRestaurantUseCase;
+import com.example.go4lunch.usecase.WorkMatesUseCase;
 
 public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
     private static LocationRepository locationRepository;
     private static PlaceRepository placeRepository;
+    private static WorkmateRepository workmateRepository;
     private static ViewModelFactory viewModelFactory;
 
     private ViewModelFactory(LocationRepository locationRepository) {
@@ -29,6 +32,9 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         if (modelClass.isAssignableFrom(MapViewModel.class)) {
             return (T) new MapViewModel(new NearRestaurantUseCase(locationRepository, placeRepository));
         }
+        if (modelClass.isAssignableFrom(WorkMateViewModel.class)) {
+            return (T) new WorkMateViewModel(new WorkMatesUseCase(workmateRepository));
+        }
 
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }
@@ -37,9 +43,14 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         if (viewModelFactory == null) {
             synchronized (ViewModelFactory.class) {
                 if (viewModelFactory == null) {
-                    locationRepository = LocationRepository.getInstance(context);
-                    placeRepository = PlaceRepository.getInstance(context, application, locationRepository);
-                    viewModelFactory = new ViewModelFactory(locationRepository);
+                    if (context != null) {
+                        locationRepository = LocationRepository.getInstance(context);
+                        viewModelFactory = new ViewModelFactory(locationRepository);
+                    }
+
+                    if (context != null && application != null)
+                        placeRepository = PlaceRepository.getInstance(context, application, locationRepository);
+                    workmateRepository = WorkmateRepository.getInstance();
                 }
             }
         }

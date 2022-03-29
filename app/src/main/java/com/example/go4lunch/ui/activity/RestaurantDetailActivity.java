@@ -3,6 +3,7 @@ package com.example.go4lunch.ui.activity;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -15,19 +16,39 @@ import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
-import com.example.go4lunch.databinding.FragmentDetailsRestaurantsBinding;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.ui.viewmodel.RestaurantViewModel;
 
-public class RestaurantDetailActivity extends BaseActivity<FragmentDetailsRestaurantsBinding> {
+import com.example.go4lunch.databinding.ActivityDetailsRestaurantsBinding;
+import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.model.WorkmateModel;
+import com.example.go4lunch.ui.recyclerView.adapters.WorkmateLikedRestaurantAdapter;
+import com.example.go4lunch.ui.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
+import com.example.go4lunch.ui.viewmodel.WorkMateViewModel;
+import com.example.go4lunch.usecase.WorkMatesUpdateState;
+import com.example.go4lunch.utils.Preferences;
+
+import java.util.ArrayList;
+
+public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestaurantsBinding> {
     private static final int MY_PERMISSION_REQUEST_CODE_CALL_PHONE = 555;
+    public static final int NO_RESTAURANT_LIKED = 0;
+    private WorkMateViewModel workMateViewModel;
+    private String placeId;
+    private Preferences preferences;
+    private WorkmateLikedRestaurantAdapter adapter;
+
+    public interface AlertDialogInterface {
+        void doSomething();
+    }
 
     @Override
-    FragmentDetailsRestaurantsBinding getViewBinding() {
-        return DataBindingUtil.setContentView(this, R.layout.fragment_details_restaurants);
+    ActivityDetailsRestaurantsBinding getViewBinding() {
+        return DataBindingUtil.setContentView(this, R.layout.activity_details_restaurants);
     }
 
     @Override
@@ -38,17 +59,59 @@ public class RestaurantDetailActivity extends BaseActivity<FragmentDetailsRestau
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        RestaurantViewModel restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-        String placeId = getIntent().getStringExtra("placeId");
-        restaurantViewModel.getRestaurant(placeId).observe(this, this::updateUi);
+        placeId = getIntent().getStringExtra("placeId");
+        preferences = new Preferences(this);
+        initViewModel();
+
+        binding.actionStar.setOnClickListener(v -> {
+
+        });
+
+        binding.floatingActionButtonLike.setOnClickListener(click -> {
+            if (preferences.getBoolean(Preferences.HAS_LIKED_RESTAURANT)) {
+                String title = getResources().getString(R.string.alert_dialog_title);
+                String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
+                showAlertDialog(() -> {
+                    displayDisLikeButton();
+                    workMateViewModel.persistWorkmateLikedRestaurant(placeId);
+                }, title, message);
+            } else {
+                workMateViewModel.persistWorkmateLikedRestaurant(placeId);
+                preferences.setBoolean(Preferences.HAS_LIKED_RESTAURANT, true);
+                displayDisLikeButton();
+            }
+        });
+
+        binding.floatingActionButtonDislike.setOnClickListener(click -> {
+            String title = getResources().getString(R.string.alert_dialog_title);
+            String message = getResources().getString(R.string.alert_dialog_restaurant_detail_dislike_message);
+            showAlertDialog(() -> {
+                displayLikeButton();
+                preferences.setBoolean(Preferences.HAS_LIKED_RESTAURANT, false);
+                workMateViewModel.deleteUserWhoLikedRestaurant(workMateViewModel.getCurrentUser().getUid());
+            }, title, message);
+        });
+
+        initRecyclerView();
+
+        workMateViewModel.state.observe(this, this::workmateRender);
+
     }
 
-    private void updateUi(RestaurantEntity restaurantEntity) {
+    private void initViewModel() {
+        RestaurantViewModel restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
+        workMateViewModel = ViewModelFactory.getInstance(getApplicationContext(), getApplication()).obtainViewModel(WorkMateViewModel.class);
+        workMateViewModel.onLoadView();
+        restaurantViewModel.getRestaurant(placeId).observe(this, this::render);
+        workMateViewModel.addListener(placeId);
+    }
+
+    private void render(RestaurantEntity restaurantEntity) {
         if (restaurantEntity != null) {
             binding.restaurantName.setText(restaurantEntity.getName());
-            binding.restaurantAddress.setText(restaurantEntity.getAddress());
+            binding.restaurantAddress.setText(restaurantEntity.getPlaceId());
             binding.restaurantRatingBar.setRating(restaurantEntity.getRating());
-            injectImageInView(restaurantEntity);
+            loadImageInView(restaurantEntity);
 
             if (hasNumberPhone(restaurantEntity.getPhoneNumber())) {
                 binding.actionCall.setVisibility(View.VISIBLE);
@@ -63,15 +126,55 @@ public class RestaurantDetailActivity extends BaseActivity<FragmentDetailsRestau
         }
     }
 
+    private void workmateRender(WorkMatesUpdateState workMatesUpdateState) {
+        workMateViewModel.setWorkmateList(workMatesUpdateState.getWorkmateModelArrayList());
+        final ArrayList<WorkmateModel> workmateList = workMateViewModel.getWorkmateList();
+        boolean hasLikedThisRestaurant = workMateViewModel.hasLikedThisRestaurant(workmateList);
+
+        initRecyclerView();
+        manageFab(hasLikedThisRestaurant);
+    }
+
+    private void showAlertDialog(AlertDialogInterface alertDialogInterface, String title, String message) {
+        new AlertDialog.Builder(this)
+                .setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(android.R.string.yes, (dialog, which) -> alertDialogInterface.doSomething())
+                .setNegativeButton(android.R.string.no, null)
+                .show();
+    }
+
+    private void manageFab(boolean value) {
+        if (value) {
+            binding.floatingActionButtonDislike.setVisibility(View.VISIBLE);
+            binding.floatingActionButtonLike.setVisibility(View.GONE);
+        } else {
+            binding.floatingActionButtonDislike.setVisibility(View.GONE);
+            binding.floatingActionButtonLike.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void displayDisLikeButton() {
+        binding.floatingActionButtonDislike.setVisibility(View.VISIBLE);
+        binding.floatingActionButtonLike.setVisibility(View.GONE);
+    }
+
+    private void displayLikeButton() {
+        binding.floatingActionButtonLike.setVisibility(View.VISIBLE);
+        binding.floatingActionButtonDislike.setVisibility(View.GONE);
+    }
+
+
     private boolean hasALink(String webSitUri) {
         return webSitUri != null;
     }
 
     private boolean hasNumberPhone(String phoneNumber) {
         return phoneNumber != null;
+
     }
 
-    private void injectImageInView(RestaurantEntity restaurantEntity) {
+    private void loadImageInView(RestaurantEntity restaurantEntity) {
         Glide.with(getApplicationContext())
                 .load(restaurantEntity.getImage())
                 .into(binding.imageView);
@@ -163,5 +266,12 @@ public class RestaurantDetailActivity extends BaseActivity<FragmentDetailsRestau
                 Toast.makeText(this, "Action Failed", Toast.LENGTH_LONG).show();
             }
         }
+    }
+
+    private void initRecyclerView() {
+        adapter = new WorkmateLikedRestaurantAdapter(workMateViewModel.getWorkmateList());
+        binding.workmatesRecyclerview.setAdapter(adapter);
+        binding.workmatesRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
+        binding.workmatesRecyclerview.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));
     }
 }

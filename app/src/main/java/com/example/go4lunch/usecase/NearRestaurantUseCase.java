@@ -45,7 +45,6 @@ public class NearRestaurantUseCase extends MediatorLiveData<NearRestaurantUpdate
     }
 
 
-
     public void startService() {
         locationRepository.startService();
     }

@@ -46,4 +46,6 @@ public class MapViewModel extends ViewModel {
     public void stopLocationUpdate(){
         nearRestaurantUseCase.stopLocationUpdate();
     }
+
+
 }

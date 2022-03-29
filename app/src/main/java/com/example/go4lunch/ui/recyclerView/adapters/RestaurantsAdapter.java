@@ -3,6 +3,8 @@ package com.example.go4lunch.ui.recyclerView.adapters;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.FragmentActivity;
@@ -14,17 +16,20 @@ import com.example.go4lunch.ui.activity.HomeScreenActivity;
 import com.example.go4lunch.ui.recyclerView.viewHolder.RestaurantsViewHolder;
 import com.google.android.libraries.places.api.net.PlacesClient;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHolder> {
+public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHolder> implements Filterable {
 
     private static final String TAG = RestaurantsAdapter.class.getSimpleName();
-    public final List<RestaurantModel> listRestaurants;
+    public final List<RestaurantModel> restaurantList;
     private final FragmentActivity activity;
+    private List<RestaurantModel> restaurantFiltered;
 
-    public RestaurantsAdapter(List<RestaurantModel> listRestaurants, PlacesClient placesClient, FragmentActivity activity) {
+    public RestaurantsAdapter(List<RestaurantModel> restaurantList, PlacesClient placesClient, FragmentActivity activity) {
         this.activity = activity;
-        this.listRestaurants = listRestaurants;
+        this.restaurantList = restaurantList;
+        this.restaurantFiltered = restaurantList;
     }
 
     @NonNull
@@ -38,7 +43,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantsViewHolder holder, int position) {
-        RestaurantModel restaurantModel = listRestaurants.get(position);
+        RestaurantModel restaurantModel = restaurantFiltered.get(position);
 
         if (restaurantModel.isOpen().equals(activity.getResources().getString(R.string.place_open))) {
             holder.itemRestaurantOpen.setTextColor(activity.getResources().getColor(R.color.colorGreen));
@@ -53,7 +58,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
         holder.itemUserRatingTotal.setText("( " + restaurantModel.getUserRatingTotal() + " )");
         holder.itemDistance.setText(restaurantModel.getUserDistance() + " m ");
         holder.itemRestaurantOpen.setText(restaurantModel.isOpen());
-        holder.itemView.setOnClickListener(v -> ((HomeScreenActivity) activity).startActivity(restaurantModel.getPlaceId()));
+        holder.itemView.setOnClickListener(v -> ((HomeScreenActivity) activity).startRestaurantDetailActivity(restaurantModel.getPlaceId()));
     }
 
     @Override
@@ -62,6 +67,43 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
     }
 
     public int getNumberOfRestaurants() {
-        return listRestaurants.size();
+        return restaurantFiltered.size();
     }
+
+    @Override
+    public Filter getFilter() {
+        return new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence charSequence) {
+                String charString = charSequence.toString();
+                if (charString.isEmpty()) {
+                    restaurantFiltered = restaurantList;
+                } else {
+                    List<RestaurantModel> filteredList = new ArrayList<>();
+                    for (RestaurantModel row : restaurantList) {
+
+                        // name match condition. this might differ depending on your requirement
+                        // here we are looking for name or phone number match
+                        if (row.getName().toLowerCase().contains(charString.toLowerCase())) {
+                            filteredList.add(row);
+                        }
+                    }
+
+                    restaurantFiltered = filteredList;
+                }
+
+                FilterResults filterResults = new FilterResults();
+                filterResults.values = restaurantFiltered;
+
+                return filterResults;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                restaurantFiltered = (ArrayList<RestaurantModel>) results.values;
+                notifyDataSetChanged();
+            }
+        };
+    }
+
 }

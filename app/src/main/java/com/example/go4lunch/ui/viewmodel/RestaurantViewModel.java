@@ -33,4 +33,5 @@ public class RestaurantViewModel extends AndroidViewModel {
     public LiveData<RestaurantEntity> getRestaurant(String placeId){
         return restaurantRepository.getRestaurant(placeId);
     }
+
 }

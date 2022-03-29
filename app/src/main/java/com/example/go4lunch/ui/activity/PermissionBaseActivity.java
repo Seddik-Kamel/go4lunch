@@ -33,7 +33,6 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
         super.onCreate(savedInstanceState);
         initBinding();
         initActivity();
-        //setPermissionGranted();
     }
 
 

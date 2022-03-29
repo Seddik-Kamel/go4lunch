@@ -60,7 +60,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mapViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(MapViewModel.class);
         mapViewModel.onLoadView();
-        View view = inflater.inflate(R.layout.map_view_fragment, container, false);
+        View view = inflater.inflate(R.layout.fragment_map_view, container, false);
         mapView = view.findViewById(R.id.mapView);
 
         return view;

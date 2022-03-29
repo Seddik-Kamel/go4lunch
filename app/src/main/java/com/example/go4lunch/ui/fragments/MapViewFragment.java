@@ -49,7 +49,7 @@ public class MapViewFragment extends GoogleMapBaseFragment {
 
     @Override
     int getResourceLayout() {
-        return R.layout.map_view_fragment;
+        return R.layout.fragment_map_view;
     }
 
 

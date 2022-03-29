@@ -25,7 +25,7 @@ public class RestaurantsViewHolder extends RecyclerView.ViewHolder {
     public RestaurantsViewHolder(@NonNull View itemView) {
         super(itemView);
         restaurantName = itemView.findViewById(R.id.item_restaurant_name);
-        imageViewRestaurant = itemView.findViewById(R.id.item_restaurant_image);
+        imageViewRestaurant = itemView.findViewById(R.id.item_workmate_image);
         textViewAddressRestaurant = itemView.findViewById(R.id.item_restaurant_address);
         itemRestaurantOpen = itemView.findViewById(R.id.item_restaurant_open);
         itemRatingBar = itemView.findViewById(R.id.restaurant_ratingBar);

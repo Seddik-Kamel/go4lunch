@@ -22,7 +22,7 @@
 
 
     <ImageView
-        android:id="@+id/item_restaurant_image"
+        android:id="@+id/item_workmate_image"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="5dp"
@@ -66,7 +66,7 @@
         android:layout_marginTop="2dp"
         android:layout_marginEnd="8dp"
         android:textColor="@color/quantum_grey"
-        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
+        app:layout_constraintEnd_toStartOf="@+id/item_workmate_image"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="120m" />
 
@@ -92,7 +92,7 @@
         android:layout_marginEnd="8dp"
         android:textColor="@color/quantum_grey"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/item_restaurant_image"
+        app:layout_constraintEnd_toStartOf="@+id/item_workmate_image"
         tools:text="(2)" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

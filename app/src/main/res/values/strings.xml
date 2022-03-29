@@ -18,5 +18,11 @@
     <string name="place_close" >Closed</string>
     <string name="unknown_information">U.W</string>
     <string name="description_like_button">Like button</string>
+    <string name="alert_dialog_title">Warning</string>
+    <string name="alert_dialog_restaurant_detail_like_message">A restaurant has already been liked, do you want to continue ? </string>
+    <string name="alert_dialog_restaurant_detail_dislike_message">Do you want to dislike this place ? </string>
+    <string name="action_search">Search</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

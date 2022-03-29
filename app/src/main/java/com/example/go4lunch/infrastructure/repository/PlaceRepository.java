@@ -127,7 +127,8 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
     }
 
     private void updateListeners(Task<ArrayList<RestaurantModel>> task) {
-        setValue(task.getResult());
+        if (task.isSuccessful())
+            setValue(task.getResult());
 
     }
 
