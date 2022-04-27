@@ -8,33 +8,29 @@ import android.view.View;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.viewbinding.ViewBinding;
 
+import com.example.go4lunch.R;
 import com.example.go4lunch.utils.eventBus.LocationEvent;
 import com.google.android.material.snackbar.Snackbar;
 
 import org.greenrobot.eventbus.EventBus;
 
-public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppCompatActivity {
+public abstract class PermissionBaseActivity extends AppCompatActivity {
 
     protected View view;
-    protected T binding;
     protected Activity activity;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 1;
     private final boolean locationPermissionGranted = false;
 
 
-
-    abstract T getViewBinding();
+    // abstract T getViewBinding();
     abstract Activity getActivity();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initBinding();
         initActivity();
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
@@ -47,7 +43,7 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
 
                 EventBus.getDefault().post(new LocationEvent(true));
 
-                Snackbar.make(view, "Permission accordée",
+                Snackbar.make(view, R.string.permission_granted,
                         Snackbar.LENGTH_SHORT)
                         .show();
             } else {
@@ -61,12 +57,6 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
         }
     }
 
-    private void initBinding() {
-        binding = getViewBinding();
-        view = binding.getRoot();
-        setContentView(view);
-    }
-
     private void initActivity() {
         activity = getActivity();
     }
@@ -74,5 +64,4 @@ public abstract class PermissionBaseActivity<T extends ViewBinding> extends AppC
     public boolean isLocationPermissionGranted() {
         return locationPermissionGranted;
     }
-
 }

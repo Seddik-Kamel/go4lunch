@@ -2,6 +2,9 @@ package com.example.go4lunch.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.location.Location;
+
+import com.google.android.gms.maps.model.LatLng;
 
 public class Preferences {
 
@@ -29,6 +32,7 @@ public class Preferences {
         this.editor.putBoolean(key, value);
         this.editor.commit();
     }
+
 
     public boolean getBoolean(String key) {
         return this.sharedPreferences.getBoolean(key, false);

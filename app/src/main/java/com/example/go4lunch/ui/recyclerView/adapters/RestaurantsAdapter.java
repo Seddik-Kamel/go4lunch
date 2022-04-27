@@ -7,6 +7,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,19 +15,17 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.model.RestaurantModel;
 import com.example.go4lunch.ui.activity.HomeScreenActivity;
 import com.example.go4lunch.ui.recyclerView.viewHolder.RestaurantsViewHolder;
-import com.google.android.libraries.places.api.net.PlacesClient;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHolder> implements Filterable {
 
-    private static final String TAG = RestaurantsAdapter.class.getSimpleName();
     public final List<RestaurantModel> restaurantList;
     private final FragmentActivity activity;
     private List<RestaurantModel> restaurantFiltered;
 
-    public RestaurantsAdapter(List<RestaurantModel> restaurantList, PlacesClient placesClient, FragmentActivity activity) {
+    public RestaurantsAdapter(List<RestaurantModel> restaurantList, FragmentActivity activity) {
         this.activity = activity;
         this.restaurantList = restaurantList;
         this.restaurantFiltered = restaurantList;
@@ -46,9 +45,9 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
         RestaurantModel restaurantModel = restaurantFiltered.get(position);
 
         if (restaurantModel.isOpen().equals(activity.getResources().getString(R.string.place_open))) {
-            holder.itemRestaurantOpen.setTextColor(activity.getResources().getColor(R.color.colorGreen));
+            holder.itemRestaurantOpen.setTextColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.colorGreen));
         } else {
-            holder.itemRestaurantOpen.setTextColor(activity.getResources().getColor(R.color.colorError));
+            holder.itemRestaurantOpen.setTextColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.colorError));
         }
 
         holder.restaurantName.setText(restaurantModel.getName());

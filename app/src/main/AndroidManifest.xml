@@ -15,12 +15,6 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity
-            android:name=".ui.activity.MainActivityToDelete2"
-            android:exported="true" >
-
-
-        </activity>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -32,12 +26,15 @@
 
         <activity
             android:name=".ui.activity.RestaurantDetailActivity"
-            android:exported="false" />
+            android:exported="true" >
+
+        </activity>
 
         <activity
             android:name=".ui.activity.LoginActivity"
             android:exported="true"
             android:theme="@style/AppTheme.NoTitle">
+
 
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

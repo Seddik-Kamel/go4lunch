@@ -37,9 +37,23 @@ import java.util.concurrent.Executors;
 
 public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
 
-    private static PlaceRepository placeRepository = null;
-    private final PlacesClient placesClient;
-    private final RestaurantRepository restaurantRepository;
+    protected static PlaceRepository placeRepository = null;
+    protected final PlacesClient placesClient;
+    protected final RestaurantRepository restaurantRepository;
+
+    protected final Context context;
+    protected final LocationRepository locationRepository;
+    protected final Executor executor = Executors.newSingleThreadExecutor();
+
+    public static final List<Place.Field> autocompleteField = Arrays.asList(
+            Place.Field.ID,
+            Place.Field.NAME,
+            Place.Field.ADDRESS,
+            Place.Field.LAT_LNG,
+            Place.Field.RATING,
+            Place.Field.PHOTO_METADATAS,
+            Place.Field.TYPES);
+
 
     private final List<Place.Field> requestFields = Arrays.asList(
             Place.Field.ID,
@@ -58,11 +72,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
             Place.Field.PHONE_NUMBER,
             Place.Field.TYPES);
 
-    private final Context context;
-    private final LocationRepository locationRepository;
-    private final Executor executor = Executors.newSingleThreadExecutor();
-
-    private PlaceRepository(Context context, Application application, LocationRepository locationRepository) {
+    protected PlaceRepository(Context context, Application application, LocationRepository locationRepository) {
         this.context = context.getApplicationContext();
         this.restaurantRepository = new RestaurantRepository(application);
         Places.initialize(context, BuildConfig.API_KEY);
@@ -126,7 +136,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         }
     }
 
-    private void updateListeners(Task<ArrayList<RestaurantModel>> task) {
+    protected void updateListeners(Task<ArrayList<RestaurantModel>> task) {
         if (task.isSuccessful())
             setValue(task.getResult());
 
@@ -141,7 +151,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         }
     }
 
-    private ArrayList<RestaurantModel> retrieveDetailsRestaurantsFromDetailsApi(Task<ArrayList<RestaurantModel>> continuation) {
+    protected ArrayList<RestaurantModel> retrieveDetailsRestaurantsFromDetailsApi(Task<ArrayList<RestaurantModel>> continuation) {
         ArrayList<RestaurantModel> restaurants = continuation.getResult();
         restaurantRepository.deleteAll();
         for (RestaurantModel restaurant : restaurants) {
@@ -150,7 +160,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         return restaurants;
     }
 
-    private void tryFetchPlaceDetails(RestaurantModel restaurant) {
+    protected void tryFetchPlaceDetails(RestaurantModel restaurant) {
         Task<FetchPlaceResponse> fetchPlaceResponseTask = placesClient.fetchPlace(FetchPlaceRequest.builder(restaurant.getPlaceId(), requestDetailFields).build());
         try {
             FetchPlaceResponse placeResponse = Tasks.await(fetchPlaceResponseTask);
@@ -160,19 +170,18 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         }
     }
 
-    private void updateRestaurantWithPlaceResponse(RestaurantModel restaurant, FetchPlaceResponse placeResponse) {
+    protected void updateRestaurantWithPlaceResponse(RestaurantModel restaurant, FetchPlaceResponse placeResponse) {
         Place place = placeResponse.getPlace();
         restaurant.setWebSitUrl(place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null);
         restaurant.setPhoneNumber(place.getPhoneNumber());
         final String unknownInformation = context.getString(R.string.unknown_information);
         restaurant.setIsOpen(place.isOpen() != null ? place.isOpen() ? context.getString(R.string.place_open) : context.getString(R.string.place_close) : unknownInformation);
 
-        RestaurantEntity restaurantEntity = RestaurantEntity.updateData(restaurant);
-        restaurantRepository.insert(restaurantEntity);
+        restaurantRepository.insert(RestaurantEntity.updateData(restaurant));
     }
 
     @NonNull
-    private ArrayList<RestaurantModel> retrievePhotoRestaurantsFromPhotoApi(Task<ArrayList<RestaurantModel>> continuation) {
+    protected ArrayList<RestaurantModel> retrievePhotoRestaurantsFromPhotoApi(Task<ArrayList<RestaurantModel>> continuation) {
         ArrayList<RestaurantModel> restaurants = continuation.getResult();
         for (RestaurantModel restaurant : restaurants)
             if (restaurant.getPhotoMetadata() != null)
@@ -193,5 +202,11 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
 
     public PlacesClient getPlacesClient() {
         return placesClient;
+    }
+
+    @NonNull
+    protected Task<FetchPhotoResponse> generateFetchPhotoTask(RestaurantModel restaurant) {
+        return placesClient.fetchPhoto(
+                FetchPhotoRequest.builder(restaurant.getPhotoMetadata()).build());
     }
 }

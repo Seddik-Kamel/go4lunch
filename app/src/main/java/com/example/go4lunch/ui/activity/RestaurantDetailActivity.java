@@ -15,32 +15,33 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.databinding.DataBindingUtil;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
-
 import com.example.go4lunch.databinding.ActivityDetailsRestaurantsBinding;
 import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.model.WorkmateModel;
+import com.example.go4lunch.state.FavoriteRestaurantState;
+import com.example.go4lunch.state.RestaurantLikedState;
+import com.example.go4lunch.state.WorkMatesUpdateState;
 import com.example.go4lunch.ui.recyclerView.adapters.WorkmateLikedRestaurantAdapter;
-import com.example.go4lunch.ui.viewmodel.RestaurantViewModel;
+import com.example.go4lunch.ui.viewmodel.RestaurantDetailViewModel;
 import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
-import com.example.go4lunch.ui.viewmodel.WorkMateViewModel;
-import com.example.go4lunch.usecase.WorkMatesUpdateState;
-import com.example.go4lunch.utils.Preferences;
 
 import java.util.ArrayList;
 
+
 public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestaurantsBinding> {
     private static final int MY_PERMISSION_REQUEST_CODE_CALL_PHONE = 555;
-    public static final int NO_RESTAURANT_LIKED = 0;
-    private WorkMateViewModel workMateViewModel;
+
     private String placeId;
-    private Preferences preferences;
-    private WorkmateLikedRestaurantAdapter adapter;
+    private String phoneNumber;
+    private RestaurantDetailViewModel restaurantDetailViewModel;
+    private boolean isLiked;
+
 
     public interface AlertDialogInterface {
         void doSomething();
@@ -59,57 +60,49 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        placeId = getIntent().getStringExtra("placeId");
-        preferences = new Preferences(this);
+        //placeId = getIntent().getStringExtra("placeId");
+        placeId = "ChIJhbeFtlPIlkcR83m5lfVPwB0";
         initViewModel();
-
-        binding.actionStar.setOnClickListener(v -> {
-
-        });
-
-        binding.floatingActionButtonLike.setOnClickListener(click -> {
-            if (preferences.getBoolean(Preferences.HAS_LIKED_RESTAURANT)) {
-                String title = getResources().getString(R.string.alert_dialog_title);
-                String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
-                showAlertDialog(() -> {
-                    displayDisLikeButton();
-                    workMateViewModel.persistWorkmateLikedRestaurant(placeId);
-                }, title, message);
-            } else {
-                workMateViewModel.persistWorkmateLikedRestaurant(placeId);
-                preferences.setBoolean(Preferences.HAS_LIKED_RESTAURANT, true);
-                displayDisLikeButton();
-            }
-        });
-
-        binding.floatingActionButtonDislike.setOnClickListener(click -> {
-            String title = getResources().getString(R.string.alert_dialog_title);
-            String message = getResources().getString(R.string.alert_dialog_restaurant_detail_dislike_message);
-            showAlertDialog(() -> {
-                displayLikeButton();
-                preferences.setBoolean(Preferences.HAS_LIKED_RESTAURANT, false);
-                workMateViewModel.deleteUserWhoLikedRestaurant(workMateViewModel.getCurrentUser().getUid());
-            }, title, message);
-        });
-
-        initRecyclerView();
-
-        workMateViewModel.state.observe(this, this::workmateRender);
-
+        initObservers();
+        likePlace();
+        disLikePlace();
     }
 
-    private void initViewModel() {
-        RestaurantViewModel restaurantViewModel = new ViewModelProvider(this).get(RestaurantViewModel.class);
-        workMateViewModel = ViewModelFactory.getInstance(getApplicationContext(), getApplication()).obtainViewModel(WorkMateViewModel.class);
-        workMateViewModel.onLoadView();
-        restaurantViewModel.getRestaurant(placeId).observe(this, this::render);
-        workMateViewModel.addListener(placeId);
+    private void initObservers() {
+        restaurantDetailViewModel.listenWorkmateWhoLikePlace(placeId);
+        restaurantDetailViewModel.state.observe(this, this::workmateRender);
+        restaurantDetailViewModel.onLoadView();
+        restaurantDetailViewModel.onLoadViewFavoritePlace();
+        restaurantDetailViewModel.onLoadViewLikedPlace();
+        restaurantDetailViewModel.getRestaurant(placeId).observe(this, this::placeRender);
+        restaurantDetailViewModel.updateFavoriteRestaurantListener(placeId);
+        restaurantDetailViewModel.favoriteRestaurantState.observe(this, this::favoritePlaceRender);
+        restaurantDetailViewModel.likedRestaurantState.observe(this, this::likedRestaurantRender);
     }
 
-    private void render(RestaurantEntity restaurantEntity) {
+    private void likedRestaurantRender(RestaurantLikedState restaurantLikedState) {
+        if (placeId != null)
+            isLiked = restaurantDetailViewModel.restaurantHasLiked(restaurantLikedState.getRestaurantModelArrayList(), placeId);
+    }
+
+
+    private void favoritePlaceRender(@NonNull FavoriteRestaurantState favoriteRestaurantState) {
+        if (restaurantDetailViewModel.hasAFavoriteRestaurant(favoriteRestaurantState.getFavoriteRestaurantModel(), placeId)) {
+            binding.actionNoStar.setVisibility(View.GONE);
+            binding.actionStar.setVisibility(View.VISIBLE);
+
+            binding.actionStar.setOnClickListener(click -> {
+                restaurantDetailViewModel.deleteFavoriteRestaurant(placeId);
+                binding.actionNoStar.setVisibility(View.VISIBLE);
+                binding.actionStar.setVisibility(View.INVISIBLE);
+            });
+        }
+    }
+
+    private void placeRender(RestaurantEntity restaurantEntity) {// from local database.
         if (restaurantEntity != null) {
             binding.restaurantName.setText(restaurantEntity.getName());
-            binding.restaurantAddress.setText(restaurantEntity.getPlaceId());
+            binding.restaurantAddress.setText(restaurantEntity.getAddress());
             binding.restaurantRatingBar.setRating(restaurantEntity.getRating());
             loadImageInView(restaurantEntity);
 
@@ -117,22 +110,63 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
                 binding.actionCall.setVisibility(View.VISIBLE);
                 binding.actionCallDisable.setVisibility(View.INVISIBLE);
                 binding.actionCall.setClickable(true);
-                binding.actionCall.setOnClickListener(v -> askPermissionAndCall(restaurantEntity.getPhoneNumber()));
+                phoneNumber = restaurantEntity.getPhoneNumber();
+                binding.actionCall.setOnClickListener(v -> askPermissionAndCall(phoneNumber));
             }
 
             if (hasALink(restaurantEntity.getWebSitUri())) {
+                binding.actionWeb.setVisibility(View.VISIBLE);
+                binding.actionNoWeb.setVisibility(View.GONE);
                 binding.actionWeb.setOnClickListener(action -> launchPageWeb(restaurantEntity.getWebSitUri()));
             }
+
+            binding.actionNoStar.setOnClickListener(click -> {
+                restaurantDetailViewModel.saveFavoriteRestaurant(restaurantEntity);
+                restaurantDetailViewModel.updateFavoriteRestaurantListener(placeId);
+            });
         }
     }
 
-    private void workmateRender(WorkMatesUpdateState workMatesUpdateState) {
-        workMateViewModel.setWorkmateList(workMatesUpdateState.getWorkmateModelArrayList());
-        final ArrayList<WorkmateModel> workmateList = workMateViewModel.getWorkmateList();
-        boolean hasLikedThisRestaurant = workMateViewModel.hasLikedThisRestaurant(workmateList);
+    private void workmateRender(@NonNull WorkMatesUpdateState workMatesUpdateState) {
+        initRecyclerView(workMatesUpdateState.getWorkmateModelArrayList());
+        boolean hasLikedThisRestaurant = restaurantDetailViewModel.hasLikedThisRestaurant(workMatesUpdateState.getWorkmateModelArrayList());
+        manageLikeFab(hasLikedThisRestaurant);
+    }
 
-        initRecyclerView();
-        manageFab(hasLikedThisRestaurant);
+    private void disLikePlace() {
+        binding.floatingActionButtonDislike.setOnClickListener(click -> {
+            String title = getResources().getString(R.string.alert_dialog_title);
+            String message = getResources().getString(R.string.alert_dialog_restaurant_detail_dislike_message);
+            showAlertDialog(() -> {
+                displayLikeButton();
+                restaurantDetailViewModel.deleteUserWhoLikedRestaurant(FirebaseRepository.getCurrentUserUID());
+                restaurantDetailViewModel.deleteRestaurantLiked(placeId);
+
+            }, title, message);
+        });
+    }
+
+    private void likePlace() {
+        binding.floatingActionButtonLike.setOnClickListener(click -> {
+            // récupère cette fameuse liste.
+            if (isLiked) {
+                String title = getResources().getString(R.string.alert_dialog_title);
+                String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
+                showAlertDialog(() -> {
+                    displayDisLikeButton();
+                    restaurantDetailViewModel.persistWorkmateLikedRestaurant(placeId);
+                    restaurantDetailViewModel.saveRestaurantsLiked(placeId);
+                }, title, message);
+            } else {
+                restaurantDetailViewModel.persistWorkmateLikedRestaurant(placeId);
+                restaurantDetailViewModel.saveRestaurantsLiked(placeId);
+                displayDisLikeButton();
+            }
+        });
+    }
+
+    private void initViewModel() {
+        restaurantDetailViewModel = ViewModelFactory.getInstance(getApplicationContext(), getActivity().getApplication()).obtainViewModel(RestaurantDetailViewModel.class);
     }
 
     private void showAlertDialog(AlertDialogInterface alertDialogInterface, String title, String message) {
@@ -144,7 +178,7 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
                 .show();
     }
 
-    private void manageFab(boolean value) {
+    private void manageLikeFab(boolean value) {
         if (value) {
             binding.floatingActionButtonDislike.setVisibility(View.VISIBLE);
             binding.floatingActionButtonLike.setVisibility(View.GONE);
@@ -164,14 +198,12 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         binding.floatingActionButtonDislike.setVisibility(View.GONE);
     }
 
-
     private boolean hasALink(String webSitUri) {
         return webSitUri != null;
     }
 
     private boolean hasNumberPhone(String phoneNumber) {
         return phoneNumber != null;
-
     }
 
     private void loadImageInView(RestaurantEntity restaurantEntity) {
@@ -193,23 +225,17 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     }
 
     private void askPermissionAndCall(String phoneNumber) {
+        // Check if we have Call permission
+        int sendSmsPermission = ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.CALL_PHONE);
 
-        // With Android Level >= 23, you have to ask the user
-        // for permission to Call.
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) { // 23
-
-            // Check if we have Call permission
-            int sendSmsPermission = ActivityCompat.checkSelfPermission(this,
-                    Manifest.permission.CALL_PHONE);
-
-            if (sendSmsPermission != PackageManager.PERMISSION_GRANTED) {
-                // If don't have permission so prompt the user.
-                this.requestPermissions(
-                        new String[]{Manifest.permission.CALL_PHONE},
-                        MY_PERMISSION_REQUEST_CODE_CALL_PHONE
-                );
-                return;
-            }
+        if (sendSmsPermission != PackageManager.PERMISSION_GRANTED) {
+            // If don't have permission so prompt the user.
+            this.requestPermissions(
+                    new String[]{Manifest.permission.CALL_PHONE},
+                    MY_PERMISSION_REQUEST_CODE_CALL_PHONE
+            );
+            return;
         }
         this.callNow(phoneNumber);
     }
@@ -241,8 +267,7 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
                 Log.i("LOG_TAG", "Permission granted!");
                 Toast.makeText(this, "Permission granted!", Toast.LENGTH_LONG).show();
-
-                // this.callNow();
+                this.callNow(phoneNumber);
             }
             // Cancelled or denied.
             else {
@@ -268,8 +293,8 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         }
     }
 
-    private void initRecyclerView() {
-        adapter = new WorkmateLikedRestaurantAdapter(workMateViewModel.getWorkmateList());
+    private void initRecyclerView(ArrayList<WorkmateModel> workmateList) {
+        WorkmateLikedRestaurantAdapter adapter = new WorkmateLikedRestaurantAdapter(workmateList);
         binding.workmatesRecyclerview.setAdapter(adapter);
         binding.workmatesRecyclerview.setLayoutManager(new LinearLayoutManager(getActivity()));
         binding.workmatesRecyclerview.addItemDecoration(new DividerItemDecoration(getActivity().getApplicationContext(), DividerItemDecoration.VERTICAL));

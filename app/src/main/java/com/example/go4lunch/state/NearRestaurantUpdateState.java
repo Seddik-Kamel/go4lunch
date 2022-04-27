@@ -1,12 +1,13 @@
-package com.example.go4lunch.usecase;
+package com.example.go4lunch.state;
 
 import android.location.Location;
 
 import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.state.MainPageState;
 
 import java.util.ArrayList;
 
-public class NearRestaurantUpdateState {
+public class NearRestaurantUpdateState implements MainPageState {
 
     final Location currentLocation;
     final ArrayList<RestaurantModel> restaurantModelArrayList;

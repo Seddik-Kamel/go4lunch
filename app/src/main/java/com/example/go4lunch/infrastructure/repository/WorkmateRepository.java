@@ -22,24 +22,31 @@ import com.google.firebase.firestore.WriteBatch;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
 public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
 
     private static final String USER_COLLECTION_NAME = "users";
-    private static final String RESTAURANT_COLLECTION_NAME = "restaurant_liked";
+    private static final String RESTAURANT_COLLECTION_NAME = "restaurant_liked_by_workmate";
+    private static final String FAVORITE_RESTAURANT = "favorite_restaurant";
+
+    public static final String PLACE_ID_LIKED = "placeIdLiked";
 
     private static volatile WorkmateRepository instance;
     private final Executor executor = Executors.newSingleThreadExecutor();
 
-    private CollectionReference getUserCollection() {
+
+    private CollectionReference getWorkmateCollection() {
         return FirebaseFirestore.getInstance().collection(USER_COLLECTION_NAME);
     }
 
-    private CollectionReference getRestaurantCollection() {
+    private CollectionReference getRestaurantLikedByWorkmateCollection() {
         return FirebaseFirestore.getInstance().collection(RESTAURANT_COLLECTION_NAME);
+    }
+
+    private CollectionReference getFavoriteRestaurantCollection() {
+        return FirebaseFirestore.getInstance().collection(FAVORITE_RESTAURANT);
     }
 
     public static WorkmateRepository getInstance() {
@@ -54,27 +61,18 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
         }
     }
 
-    @Nullable
-    public FirebaseUser getCurrentUser() {
-        return FirebaseRepository.getAuth().getCurrentUser();
-    }
-
     public Task<Void> signOut(Context context) {
         return FirebaseRepository.getAuthUi().signOut(context);
     }
 
-    public Task<Void> deleteUser(Context context) {
-        return FirebaseRepository.getAuthUi().delete(context);
-    }
-
     @Nullable
     public String getCurrentUserUID() {
-        FirebaseUser user = getCurrentUser();
+        FirebaseUser user = FirebaseRepository.getCurrentUser();
         return (user != null) ? user.getUid() : null;
     }
 
-    private WorkmateModel createUser() {
-        FirebaseUser user = getCurrentUser();
+    public static WorkmateModel createWorkmate() {
+        FirebaseUser user = FirebaseRepository.getCurrentUser();
         if (user != null) {
             String urlPicture = (user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : null);
             String userName = (user.getDisplayName());
@@ -85,32 +83,29 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
             return null;
     }
 
-    public Task<DocumentSnapshot> persistUser() {
-        WorkmateModel workmateModel = createUser();
-        return Objects.requireNonNull(getUserData()).addOnSuccessListener(documentSnapshot -> this.getUserCollection().document(workmateModel.getUserUid()).set(workmateModel));
-    }
-
-    private Task<DocumentSnapshot> getUserData() {
+    public Task<DocumentSnapshot> saveWorkmate() {
+        WorkmateModel workmateModel = createWorkmate();
         String uid = this.getCurrentUserUID();
-        if (uid != null) {
-            return this.getUserCollection().document(uid).get();
-        } else {
+        if (uid != null && workmateModel != null) {
+            return getWorkmateCollection().document(uid)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> this.getWorkmateCollection().document(workmateModel.getUserUid()).set(workmateModel));
+
+        } else
             return null;
-        }
     }
 
     public void deleteWorkmateWhoLikedRestaurant(String userUID) {
-        getRestaurantCollection()
+        getRestaurantLikedByWorkmateCollection()
                 .document(userUID)
                 .delete()
                 .addOnSuccessListener(aVoid -> Log.d("delete_user", "DocumentSnapshot successfully deleted!"))
                 .addOnFailureListener(e -> Log.w("delete_user", "Error deleting document", e));
     }
 
-
-    public void addSnapShotListener(String placeId) {
-        getRestaurantCollection()
-                .whereEqualTo("placeIdLiked", placeId)
+    public void listenWorkmateWhoLikePlace(String placeId) {
+        getRestaurantLikedByWorkmateCollection()
+                .whereEqualTo(PLACE_ID_LIKED, placeId)
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.w("TAG", "Listen failed.", error);
@@ -123,9 +118,7 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
                             WorkmateModel workmateModel = queryDocumentSnapshot.toObject(WorkmateModel.class);
                             workmateModels.add(workmateModel);
                         }
-
                         setValue(workmateModels);
-
                     } else {
 
                         Log.d("TAG", "Current data: null");
@@ -133,8 +126,12 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
                 });
     }
 
-    public void addWorkmateSnapShotListener() {
-        getUserCollection()
+    /**
+     * Use in workmateFragment for listen new workmate
+     */
+
+    public void listenWorkmate() {
+        getWorkmateCollection()
                 .addSnapshotListener((value, error) -> {
                     if (error != null) {
                         Log.w("TAG", "Listen failed.", error);
@@ -147,7 +144,6 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
                             WorkmateModel workmateModel = queryDocumentSnapshot.toObject(WorkmateModel.class);
                             workmateModels.add(workmateModel);
                         }
-
                         setValue(workmateModels);
 
                     } else {
@@ -159,26 +155,25 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
 
     /**
      * Persist workmate when the user like a restaurant
-     *
-     * @param placeId
      */
-    public void persistWorkmateLikedRestaurant(String placeId) {
-        WorkmateModel workmateModel = createUser();
+    public void saveWorkmateWhoLikedRestaurant(String placeId) {
+        WorkmateModel workmateModel = createWorkmate();
         if (workmateModel != null) {
             workmateModel.setPlaceIdLiked(placeId);
-            getRestaurantCollection()
+            getRestaurantLikedByWorkmateCollection()
                     .document(workmateModel.getUserUid())
                     .set(workmateModel)
-                    .addOnSuccessListener(event -> Log.d("add workmate", "DocumentSnapshot written with ID: " + "ok"))
+                    .addOnSuccessListener(event -> Log.d("add workmate", "ok"))
                     .addOnFailureListener(event -> Log.w("add workmate", event.getMessage()));
         }
     }
 
-    public void deleteCollection(/*List<String> placeIdList*/) {
+
+    public void deleteWorkmateLikedRestaurantCollection() {
         int batchSize = 100;
         executor.execute(() -> {
             try {
-                Query query = getRestaurantCollection()
+                Query query = getRestaurantLikedByWorkmateCollection()
                         .orderBy(FieldPath.documentId()).limit(batchSize);
 
                 // Get a list of deleted documents
@@ -189,7 +184,7 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
                 // next batch and delete again
                 while (deleted.size() >= batchSize) {
                     DocumentSnapshot last = deleted.get(deleted.size() - 1);
-                    query = getRestaurantCollection().orderBy(FieldPath.documentId())
+                    query = getRestaurantLikedByWorkmateCollection().orderBy(FieldPath.documentId())
                             .startAfter(last.getId())
                             .limit(batchSize);
                     deleted = deleteQueryBatch(query);
@@ -208,28 +203,10 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
         for (QueryDocumentSnapshot snapshot : querySnapshot) {
             batch.delete(snapshot.getReference());
             Log.i("deleteCollectionDebug", "in the second for");
-
         }
         Tasks.await(batch.commit());
         Log.i("deleteCollectionDebug", "after the await");
 
         return querySnapshot.getDocuments();
     }
-
-    public void getListRestaurant() {
-        CollectionReference collection = FirebaseFirestore.getInstance().collection("restaurant_liked");
-        collection.get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            Log.d("getListRestaurant", document.getId() + " => " + document.getData());
-                        }
-                    } else {
-                        Log.d("getListRestaurant", "Error getting documents: ", task.getException());
-                    }
-                });
-    }
-
-
 }

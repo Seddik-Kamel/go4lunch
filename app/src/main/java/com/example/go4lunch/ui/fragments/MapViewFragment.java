@@ -10,7 +10,6 @@ import androidx.annotation.Nullable;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.utils.eventBus.LocationEvent;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -18,7 +17,6 @@ import org.greenrobot.eventbus.Subscribe;
 public class MapViewFragment extends GoogleMapBaseFragment {
 
     public static final String LOCATION_GRANTED = "isLocationPermissionGranted";
-    public static final float HUE_ORANGE = BitmapDescriptorFactory.HUE_ORANGE;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -65,5 +63,4 @@ public class MapViewFragment extends GoogleMapBaseFragment {
         fragment.setArguments(args);
         return fragment;
     }
-
 }

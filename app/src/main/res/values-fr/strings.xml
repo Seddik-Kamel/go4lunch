@@ -19,7 +19,16 @@
     <string name="description_like_button">Bouton aime</string>
     <string name="alert_dialog_title">Attention</string>
     <string name="alert_dialog_restaurant_detail_like_message">Un restaurant a déjà été liké voulez-vous continuer ?</string>
-    <string name="alert_dialog_restaurant_detail_dislike_message">"Voulez-vous ne pas sélectionner ce restaurant ? "</string>
+    <string name="alert_dialog_restaurant_detail_dislike_message">"Voulez-vous ne plus sélectionner ce restaurant ? "</string>
     <string name="action_search">Recherche</string>
+    <string name="navigation_drawer_open">Ouverture du navigation drawer</string>
+    <string name="navigation_drawer_close">Fermeture du navigateur drawer</string>
+    <string name="user_photo">photo utilisateur</string>
+    <string name="nav_menu_settings">Préférence</string>
+    <string name="nav_menu_logout">Déconnection</string>
+    <string name="permission_granted">Permission accordée</string>
+    <string name="login_canceled">Authentification annulée</string>
+    <string name="no_connection">Pas de connexion</string>
+    <string name="unknow_error">Erreur inconnue</string>
 
 </resources>

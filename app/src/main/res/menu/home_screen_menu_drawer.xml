@@ -3,22 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="navigation_view">
 
-    <group android:checkableBehavior="single">
-        <item
-            android:id="@+id/activity_main_drawer_news"
-
-            android:title="Fil d'actualité" />
-    </group>
-
-    <item android:title="Configuration">
+    <item android:title="YOUR LUNCH">
         <menu>
             <group android:checkableBehavior="single">
                 <item
                     android:id="@+id/activity_main_drawer_profile"
-                    android:title="Profil" />
+                    android:title="@string/nav_menu_settings" />
                 <item
-                    android:id="@+id/activity_main_drawer_settings"
-                    android:title="Paramètres" />
+                    android:id="@+id/activity_main_drawer_logout"
+                    android:title="@string/nav_menu_logout" />
             </group>
         </menu>
     </item>

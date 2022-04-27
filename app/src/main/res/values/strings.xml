@@ -24,5 +24,12 @@
     <string name="action_search">Search</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="user_photo">user photo</string>
+    <string name="nav_menu_settings">SETTINGS</string>
+    <string name="nav_menu_logout">LOGOUT</string>
+    <string name="permission_granted">Permission granted</string>
+    <string name="login_canceled">login canceled</string>
+    <string name="no_connection">No connection</string>
+    <string name="unknow_error">unknow error</string>
 
 </resources>

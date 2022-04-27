@@ -1,4 +1,4 @@
-package com.example.go4lunch.usecase;
+package com.example.go4lunch.state;
 
 import com.example.go4lunch.model.WorkmateModel;
 
@@ -11,7 +11,6 @@ public class WorkMatesUpdateState {
     public WorkMatesUpdateState(ArrayList<WorkmateModel> workmateModelArrayList) {
         this.workmateModelArrayList = workmateModelArrayList;
     }
-
 
     public ArrayList<WorkmateModel> getWorkmateModelArrayList() {
         return workmateModelArrayList;

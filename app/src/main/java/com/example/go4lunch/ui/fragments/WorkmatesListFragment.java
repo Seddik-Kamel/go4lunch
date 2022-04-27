@@ -15,7 +15,7 @@ import com.example.go4lunch.R;
 import com.example.go4lunch.ui.recyclerView.adapters.WorkmateLikedRestaurantAdapter;
 import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
 import com.example.go4lunch.ui.viewmodel.WorkMateViewModel;
-import com.example.go4lunch.usecase.WorkMatesUpdateState;
+import com.example.go4lunch.state.WorkMatesUpdateState;
 
 public class WorkmatesListFragment extends BaseFragment {
 
@@ -31,7 +31,7 @@ public class WorkmatesListFragment extends BaseFragment {
 
         workMateViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(WorkMateViewModel.class);
         workMateViewModel.onLoadView();
-        workMateViewModel.addWorkmateSnapShotListener();
+        workMateViewModel.listenWorkmate();
         workMateViewModel.state.observe(getViewLifecycleOwner(), this::workmateRender);
 
         return view;
@@ -49,7 +49,7 @@ public class WorkmatesListFragment extends BaseFragment {
 
     private void workmateRender(WorkMatesUpdateState workMatesUpdateState) {
         workMateViewModel.setWorkmateList(workMatesUpdateState.getWorkmateModelArrayList());
-        initRecyclerView(); //TODO a voir pour améliorer.
+        initRecyclerView();
     }
 
     private void initRecyclerView() {

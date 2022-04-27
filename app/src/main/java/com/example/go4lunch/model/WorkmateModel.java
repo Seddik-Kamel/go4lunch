@@ -12,7 +12,7 @@ public class WorkmateModel {
 
 
     /**
-     * Constructor needed for firestore to convert to object (toObject)
+     * Constructor needed for Firebase to convert to object (toObject)
      */
     public WorkmateModel() {
 

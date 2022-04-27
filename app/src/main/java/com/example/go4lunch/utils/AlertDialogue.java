@@ -3,12 +3,14 @@ package com.example.go4lunch.utils;
 import android.app.AlertDialog;
 import android.content.Context;
 
-import com.example.go4lunch.ui.activity.RestaurantDetailActivity;
-
+@SuppressWarnings("unused")
 public class AlertDialogue {
 
-// TODO a ameliorer
-    private void showAlertDialog(Context context, RestaurantDetailActivity.AlertDialogInterface alertDialogInterface, String title, String message) {
+    public interface AlertDialogInterface {
+        void doSomething();
+    }
+
+    public static void showAlertDialog(Context context, AlertDialogInterface alertDialogInterface, String title, String message) {
         new AlertDialog.Builder(context)
                 .setTitle(title)
                 .setMessage(message)

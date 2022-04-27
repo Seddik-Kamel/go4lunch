@@ -15,7 +15,6 @@ import com.example.go4lunch.databinding.ActivityMainBinding;
 import com.example.go4lunch.ui.viewmodel.AuthenticationViewModel;
 import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
 import com.example.go4lunch.ui.viewmodel.WorkMateViewModel;
-import com.example.go4lunch.utils.job.DeleteWorkmateSyncJob;
 import com.firebase.ui.auth.ErrorCodes;
 import com.firebase.ui.auth.FirebaseAuthUIActivityResultContract;
 import com.firebase.ui.auth.IdpResponse;
@@ -43,7 +42,6 @@ public class LoginActivity extends BaseActivity<ActivityMainBinding> {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DeleteWorkmateSyncJob.scheduleJob();
         setupViewModel();
         setupListener();
     }
@@ -54,14 +52,9 @@ public class LoginActivity extends BaseActivity<ActivityMainBinding> {
     }
 
     private void setupListener() {
-        if (authenticationViewModel.isCurrentUserLogged())
-
-        {
-          //  workMateViewModel.deleteAllWorkmateWhoLikedRestaurant();
+        if (authenticationViewModel.isCurrentUserLogged()) {
             startHomeActivity();
-        }
-
-        else
+        } else
             startSignInActivity();
     }
 
@@ -72,18 +65,15 @@ public class LoginActivity extends BaseActivity<ActivityMainBinding> {
     private void handleResponseAfterSignIn(FirebaseAuthUIAuthenticationResult result) {
         IdpResponse response = result.getIdpResponse();
         if (result.getResultCode() == AppCompatActivity.RESULT_OK) {
-            //TODO a voir si on peut changer ou createUser est appelé.
             //Create user in Firestore
-            workMateViewModel.persistUser().addOnCompleteListener(task -> {
-                startHomeActivity();
-            }).addOnFailureListener(e -> Log.e("save_user", e.getMessage()));
+            workMateViewModel.persistUser().addOnCompleteListener(task -> startHomeActivity()).addOnFailureListener(e -> Log.e("save_user", e.getMessage()));
         } else {
             if (response == null) {
-                showSnackBarr("Authentification annulée");
+                showSnackBarr(getString(R.string.login_canceled));
             } else if (response.getError().getErrorCode() == ErrorCodes.NO_NETWORK) {
-                showSnackBarr("Pas de connexion");
+                showSnackBarr(getString(R.string.no_connection));
             } else if (response.getError().getErrorCode() == ErrorCodes.UNKNOWN_ERROR) {
-                showSnackBarr("Erreur inconnue");
+                showSnackBarr(getString(R.string.unknow_error));
             }
         }
     }
@@ -96,9 +86,4 @@ public class LoginActivity extends BaseActivity<ActivityMainBinding> {
         Intent intent = new Intent(this, HomeScreenActivity.class);
         startActivity(intent);
     }
-   /* @Override
-    protected void onStop() {
-        super.onStop();
-        workMateViewModel.signOut(getApplicationContext());
-    }*/
 }

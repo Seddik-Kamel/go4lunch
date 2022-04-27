@@ -21,7 +21,6 @@ public class RestaurantRepository {
         allRestaurants = restaurantDao.getAlphabetizedRestaurant();
     }
 
-
     public LiveData<List<RestaurantEntity>> getAllRestaurants() {
         return allRestaurants;
     }

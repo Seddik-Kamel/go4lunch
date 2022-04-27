@@ -3,10 +3,12 @@ package com.example.go4lunch.model;
 import android.graphics.Bitmap;
 import android.location.Location;
 
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public class RestaurantModel {
@@ -19,6 +21,7 @@ public class RestaurantModel {
     private String address;
     private LatLng latLng;
     private float rating;
+    private float markedColor;
     private String isOpen;
     private String phoneNumber;
     private String webSitUri;
@@ -26,7 +29,10 @@ public class RestaurantModel {
     private Integer userRatingTotal;
     private int userDistance;
     private PhotoMetadata photoMetadata;
+    private boolean isLiked;
 
+    public static final float DEFAULT_MARKET_COLOR = BitmapDescriptorFactory.HUE_ORANGE;
+    public static final float MARKET_COLOR_RESTAURANT_LIKED = BitmapDescriptorFactory.HUE_GREEN;
 
     public RestaurantModel() {
 
@@ -42,7 +48,6 @@ public class RestaurantModel {
         restaurant.setRating(Objects.requireNonNull(place.getRating()).floatValue());
         restaurant.setMetadata(place.getPhotoMetadatas() != null ? place.getPhotoMetadatas().get(0) : null);
         restaurant.setLatLng(Objects.requireNonNull(place.getLatLng()));
-
         return restaurant;
     }
 
@@ -54,6 +59,16 @@ public class RestaurantModel {
         restaurantLocation.setLatitude(place.latitude);
         restaurantLocation.setLongitude(place.longitude);
         return (int) currentLocation.distanceTo(restaurantLocation);
+    }
+
+    public static void determineMarketColor(ArrayList<RestaurantModel> restaurantList, ArrayList<String> restaurantLikedList) {
+        for (RestaurantModel restaurantModel : restaurantList) {
+            if (restaurantLikedList.contains(restaurantModel.getPlaceId())) {
+                restaurantModel.setMarkedColor(MARKET_COLOR_RESTAURANT_LIKED);
+            } else {
+                restaurantModel.setMarkedColor(DEFAULT_MARKET_COLOR);
+            }
+        }
     }
 
     public long getId() {
@@ -175,5 +190,21 @@ public class RestaurantModel {
 
     public void setUserDistance(int userDistance) {
         this.userDistance = userDistance;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public float getMarkedColor() {
+        return markedColor;
+    }
+
+    public void setMarkedColor(float markedColor) {
+        this.markedColor = markedColor;
     }
 }

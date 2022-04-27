@@ -2,7 +2,6 @@ package com.example.go4lunch.ui.fragments;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
-import static com.example.go4lunch.ui.fragments.MapViewFragment.HUE_ORANGE;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
@@ -20,30 +19,34 @@ import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 
 import com.example.go4lunch.R;
+import com.example.go4lunch.infrastructure.entity.LocationEntity;
+import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
 import com.example.go4lunch.model.RestaurantModel;
-import com.example.go4lunch.ui.viewmodel.MapViewModel;
+import com.example.go4lunch.state.AutocompleteState;
+import com.example.go4lunch.state.MainPageState;
+import com.example.go4lunch.state.NearRestaurantUpdateState;
+import com.example.go4lunch.ui.viewmodel.MainViewModel;
 import com.example.go4lunch.ui.viewmodel.ViewModelFactory;
-import com.example.go4lunch.usecase.NearRestaurantUpdateState;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.Objects;
+import java.util.List;
 
 public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMapReadyCallback {
 
     public Location lastKnowLocation;
     private GoogleMap map;
-    private MapViewModel mapViewModel;
+    private MainViewModel mainViewModel;
     private static final int DEFAULT_ZOOM = 15;
 
     public MapView mapView;
     public boolean locationPermissionGranted = false;
+    private LocationEntity locationEntity;
 
     abstract int getActionBarTitle();
 
@@ -58,8 +61,14 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        mapViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(MapViewModel.class);
-        mapViewModel.onLoadView();
+        mainViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(MainViewModel.class);
+        //mainViewModel.onLoadView();
+
+        mainViewModel.onLoadAutoComplete();
+        mainViewModel.getLastLocationLiveData().observe(getActivity(), this::locationRender);
+        mainViewModel.getAllRestaurant().observe(getActivity(), this::restaurantRender);
+
+
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
         mapView = view.findViewById(R.id.mapView);
 
@@ -71,7 +80,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
             result -> {
                 if (result && ActivityCompat.checkSelfPermission(requireActivity(), ACCESS_FINE_LOCATION)
                         == PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(requireActivity(), ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                    mapViewModel.onLocationPermissionsAccepted();
+                    mainViewModel.onLocationPermissionsAccepted();
                     locationPermissionGranted = true;
                     updateLocationUi();
                 } else {
@@ -79,23 +88,38 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
                 }
             });
 
-    public void render(NearRestaurantUpdateState nearRestaurantUpdateState) {
-        if (nearRestaurantUpdateState != null) {
-            lastKnowLocation = Objects.requireNonNull(nearRestaurantUpdateState.getCurrentLocation());
-            mapViewModel.setRestaurantList(Objects.requireNonNull((nearRestaurantUpdateState).getRestaurantModelArrayList()));
-            moveCameraOnPosition();
+    private void locationRender(LocationEntity locationEntity) {
+        if (locationEntity != null) {
+            this.locationEntity = locationEntity;
+            Location location = new Location("");
+            location.setLongitude(locationEntity.getLongitude());
+            location.setLatitude(locationEntity.getLatitude());
+            lastKnowLocation = location;
         }
     }
+
+    private void restaurantRender(List<RestaurantEntity> restaurantEntities) {
+        if (!restaurantEntities.isEmpty())
+            moveCameraOnPosition(RestaurantEntity.updateRestaurantModel(restaurantEntities));
+    }
+
+    public void render(MainPageState mainPageState) {
+        if (mainPageState instanceof NearRestaurantUpdateState) {
+            lastKnowLocation = ((NearRestaurantUpdateState) mainPageState).getCurrentLocation();
+            moveCameraOnPosition(((NearRestaurantUpdateState) mainPageState).getRestaurantModelArrayList());
+        }
+
+        if (mainPageState instanceof AutocompleteState) {
+            moveCameraOnThiSRestaurant(((AutocompleteState) mainPageState).getRestaurantModelArrayList());
+        }
+    }
+
 
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         updateLocationUi();
-        mapViewModel.state.observe(requireActivity(), this::render);
-    }
-
-    public GoogleMap getMap() {
-        return map;
+        //mainViewModel.state.observe(requireActivity(), this::render);
     }
 
     @Override
@@ -107,7 +131,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
     @Override
     public void onPause() {
         super.onPause();
-        mapViewModel.stopLocationUpdate();
+        mainViewModel.stopLocationUpdate();
     }
 
     @SuppressWarnings("MissingPermission")
@@ -129,12 +153,25 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         }
     }
 
-    private void moveCameraOnPosition() {
+    public GoogleMap getMap() {
+        return map;
+    }
+
+    private void moveCameraOnPosition(ArrayList<RestaurantModel> restaurants) {
         if (lastKnowLocation != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM)
             );
-            addMarkers(mapViewModel.getRestaurantList());
+            addMarkers(restaurants);
+        }
+    }
+
+    private void moveCameraOnThiSRestaurant(ArrayList<RestaurantModel> restaurants) {
+        if (lastKnowLocation != null) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                    restaurants.get(0).getLatLng(), DEFAULT_ZOOM)
+            );
+            addMarkers(restaurants);
         }
     }
 
@@ -144,12 +181,12 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         mapView.getMapAsync(this);
     }
 
-    private void addMarkers(ArrayList<RestaurantModel> restaurantList) { //UI
+    private void addMarkers(ArrayList<RestaurantModel> restaurantList) {
         for (RestaurantModel restaurantModel : restaurantList) {
             getMap().addMarker(new MarkerOptions()
-                    .title(restaurantModel.getName())
-                    .position(restaurantModel.getLatLng())
-                    .icon(BitmapDescriptorFactory.defaultMarker(HUE_ORANGE))
+                            .title(restaurantModel.getName())
+                            .position(restaurantModel.getLatLng())
+                    //.icon(BitmapDescriptorFactory.defaultMarker(restaurantModel.getMarkedColor()))
             );
         }
     }

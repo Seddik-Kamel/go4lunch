@@ -24,7 +24,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            tools:src="@tools:sample/avatars" />
+            tools:src="@tools:sample/avatars"
+            android:contentDescription="TODO" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:id="@+id/floating_action_button_like"
@@ -154,13 +155,36 @@
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
         <Button
-            android:id="@+id/action_web"
+            android:id="@+id/action_no_star"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
             android:backgroundTint="@color/white"
+            android:drawableTop="@drawable/ic_baseline_no_star_24"
+            app:layout_constraintStart_toEndOf="@+id/action_call_disable"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+        <Button
+            android:id="@+id/action_web"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:visibility="gone"
+            android:backgroundTint="@color/white"
             android:drawableTop="@drawable/ic_baseline_language_24"
+            app:layout_constraintStart_toEndOf="@+id/action_star"
+            app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
+
+        <Button
+            android:id="@+id/action_no_web"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="@color/white"
+            android:drawableTop="@drawable/ic_baseline_no_web_24"
             app:layout_constraintStart_toEndOf="@+id/action_star"
             app:layout_constraintTop_toBottomOf="@+id/constraintLayout" />
 
@@ -169,6 +193,7 @@
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
