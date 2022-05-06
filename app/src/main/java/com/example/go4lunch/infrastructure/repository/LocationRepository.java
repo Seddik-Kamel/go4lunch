@@ -14,9 +14,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.LiveData;
 
 import com.example.go4lunch.infrastructure.dao.LocationDao;
-import com.example.go4lunch.infrastructure.dao.RestaurantDao;
 import com.example.go4lunch.infrastructure.database.GoLunchDatabase;
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
+import com.example.go4lunch.state.LocationState;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationCallback;
 import com.google.android.gms.location.LocationRequest;
@@ -24,7 +24,7 @@ import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
 
 
-public class LocationRepository extends LiveData<Location> {
+public class LocationRepository extends LiveData<LocationState> {
 
     private static LocationRepository mLocationFactory = null;
     private final Context context;
@@ -32,7 +32,6 @@ public class LocationRepository extends LiveData<Location> {
     private final LocationRequest mLocationRequest;
     private Location currentLocation;
     private final LocationDao locationDao;
-    private final RestaurantDao restaurantDao;
     private LocationEntity lastLocationEntity;
 
     private final LocationCallback locationUpdateCallback = new LocationCallback() {
@@ -41,22 +40,24 @@ public class LocationRepository extends LiveData<Location> {
             super.onLocationResult(locationResult);
 
             Location currentLocation = locationResult.getLastLocation();
-
             GoLunchDatabase.databaseWriteExecutor.execute(() -> {
+                boolean isNewLocation;
                 lastLocationEntity = locationDao.getLastLocation();
+
                 if (lastLocationEntity != null) {
-                    if (lastLocationEntity.isLocationChanged(currentLocation)) {
-                        deleteLocation();
-                        deleteAllRestaurant();
+                    isNewLocation = lastLocationEntity.isNewLocation(currentLocation);
+                    if (isNewLocation) {
+                        //deleteLocation();
                         insertLocation(currentLocation);
-                        setCurrentLocation(locationResult.getLastLocation());
-                        postValue(locationResult.getLastLocation());
                     }
+
                 } else {
                     insertLocation(currentLocation);
-                    setCurrentLocation(locationResult.getLastLocation());
-                    postValue(locationResult.getLastLocation());
+                    isNewLocation = true;
                 }
+
+                LocationState locationState = new LocationState(lastLocationEntity, currentLocation, isNewLocation);
+                postValue(locationState);
             });
 
         }
@@ -65,7 +66,6 @@ public class LocationRepository extends LiveData<Location> {
     public LocationRepository(Context context, Application application) {
         GoLunchDatabase goLunchDatabase = GoLunchDatabase.getDatabase(application);
         locationDao = goLunchDatabase.locationDao();
-        restaurantDao = goLunchDatabase.restaurantDao();
         this.context = context.getApplicationContext();
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         mLocationRequest = LocationRequest.create()
@@ -143,10 +143,6 @@ public class LocationRepository extends LiveData<Location> {
 
     public void deleteLocation() {
         GoLunchDatabase.databaseWriteExecutor.execute(locationDao::deleteAll);
-    }
-
-    public void deleteAllRestaurant() {
-        GoLunchDatabase.databaseWriteExecutor.execute(restaurantDao::deleteAll);
     }
 
     public LocationEntity getLastLocationEntity() {

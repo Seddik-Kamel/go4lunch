@@ -1,7 +1,6 @@
 package com.example.go4lunch.infrastructure.entity;
 
 import android.graphics.Bitmap;
-import android.location.Location;
 
 import androidx.annotation.NonNull;
 import androidx.room.ColumnInfo;
@@ -30,6 +29,11 @@ public class RestaurantEntity {
     private float rating;
     public double latitude;
     public double longitude;
+    private String isOpen;
+    private int userDistance;
+    private Integer userRatingTotal;
+    private boolean isLiked;
+    private float markedColor;
 
 
     public RestaurantEntity() {
@@ -47,6 +51,11 @@ public class RestaurantEntity {
         restaurantEntity.setImage(convertBitMapToByteArray(restaurantModel.getBitmap()));
         restaurantEntity.setLongitude(restaurantModel.getLatLng().longitude);
         restaurantEntity.setLatitude(restaurantModel.getLatLng().latitude);
+        restaurantEntity.setIsOpen(restaurantModel.isOpen());
+        restaurantEntity.setUserDistance(restaurantModel.getUserDistance());
+        restaurantEntity.setUserRatingTotal(restaurantModel.getUserRatingTotal());
+        restaurantEntity.setLiked(restaurantModel.isLiked());
+
         return restaurantEntity;
     }
 
@@ -55,8 +64,22 @@ public class RestaurantEntity {
         for (RestaurantEntity restaurantEntity : restaurantEntities) {
             RestaurantModel restaurantModel = new RestaurantModel();
             LatLng latLng = new LatLng(restaurantEntity.getLatitude(), restaurantEntity.getLongitude());
-            restaurantModel.setName(restaurantEntity.getName());
+            restaurantModel.setLongitude(restaurantEntity.getLongitude());
+            restaurantModel.setLatitude(restaurantEntity.getLatitude());
             restaurantModel.setLatLng(latLng);
+            restaurantModel.setName(restaurantEntity.getName());
+            restaurantModel.setName(restaurantEntity.getName());
+            restaurantModel.setAddress(restaurantEntity.getAddress());
+            restaurantModel.setPlaceId(restaurantEntity.getPlaceId());
+            restaurantModel.setPhoneNumber(restaurantEntity.getPhoneNumber());
+            restaurantModel.setRating(restaurantEntity.getRating());
+            restaurantModel.setIsOpen(restaurantEntity.getIsOpen());
+            restaurantModel.setUserDistance(restaurantEntity.getUserDistance());
+            restaurantModel.setUserRatingTotal(restaurantEntity.getUserRatingTotal());
+            restaurantModel.setWebSitUrl(restaurantEntity.getWebSitUri());
+            restaurantModel.setMarkedColor(restaurantEntity.markedColor);
+            restaurantModel.setLiked(restaurantEntity.isLiked());
+            restaurantModel.setBytesImage(restaurantEntity.getImage());
 
             restaurantModels.add(restaurantModel);
         }
@@ -64,6 +87,32 @@ public class RestaurantEntity {
         return restaurantModels;
     }
 
+
+    public static ArrayList<RestaurantEntity> updateRestaurantEntity(List<RestaurantModel> restaurantModels) {
+        ArrayList<RestaurantEntity> restaurantEntities = new ArrayList<>();
+        for (RestaurantModel restaurantModel : restaurantModels) {
+            RestaurantEntity restaurantEntity = new RestaurantEntity();
+            restaurantEntity.setName(restaurantEntity.getName());
+            restaurantEntity.setLongitude(restaurantModel.getLongitude());
+            restaurantEntity.setLatitude(restaurantModel.getLatitude());
+            restaurantEntity.setName(restaurantModel.getName());
+            restaurantEntity.setAddress(restaurantModel.getAddress());
+            restaurantEntity.setPlaceId(restaurantModel.getPlaceId());
+            restaurantEntity.setPhoneNumber(restaurantModel.getPhoneNumber());
+            restaurantEntity.setRating(restaurantModel.getRating());
+            restaurantEntity.setIsOpen(restaurantModel.isOpen());
+            restaurantEntity.setUserDistance(restaurantModel.getUserDistance());
+            restaurantEntity.setUserRatingTotal(restaurantModel.getUserRatingTotal());
+            restaurantEntity.setWebSitUri(restaurantModel.getWebSitUri());
+            restaurantEntity.setMarkedColor(restaurantModel.getMarkedColor());
+            restaurantEntity.setLiked(restaurantModel.isLiked());
+            restaurantEntity.setImage(restaurantModel.getBytesImage());
+
+            restaurantEntities.add(restaurantEntity);
+        }
+
+        return restaurantEntities;
+    }
 
     @NonNull
     public String getPlaceId() {
@@ -143,6 +192,46 @@ public class RestaurantEntity {
         bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream);
 
         return stream.toByteArray();
+    }
+
+    public String getIsOpen() {
+        return isOpen;
+    }
+
+    public void setIsOpen(String isOpen) {
+        this.isOpen = isOpen;
+    }
+
+    public int getUserDistance() {
+        return userDistance;
+    }
+
+    public void setUserDistance(int userDistance) {
+        this.userDistance = userDistance;
+    }
+
+    public Integer getUserRatingTotal() {
+        return userRatingTotal;
+    }
+
+    public void setUserRatingTotal(Integer userRatingTotal) {
+        this.userRatingTotal = userRatingTotal;
+    }
+
+    public boolean isLiked() {
+        return isLiked;
+    }
+
+    public void setLiked(boolean liked) {
+        isLiked = liked;
+    }
+
+    public float getMarkedColor() {
+        return markedColor;
+    }
+
+    public void setMarkedColor(float markedColor) {
+        this.markedColor = markedColor;
     }
 }
 

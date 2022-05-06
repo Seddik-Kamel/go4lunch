@@ -1,14 +1,12 @@
 package com.example.go4lunch.ui.viewmodel;
 
-import android.app.Application;
-
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
 import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
-import com.example.go4lunch.infrastructure.repository.RestaurantRepository;
+import com.example.go4lunch.infrastructure.repository.PlaceRepository;
 import com.example.go4lunch.model.FavoriteRestaurantModel;
 import com.example.go4lunch.model.WorkmateModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
@@ -23,7 +21,7 @@ import java.util.ArrayList;
 public class RestaurantDetailViewModel extends ViewModel {
 
     private final FavoriteRestaurantUseCase favoriteRestaurantUseCase;
-    private final RestaurantRepository restaurantRepository;
+    private final PlaceRepository placeRepository;
     private final WorkMatesUseCase workMatesUseCase;
     private final RestaurantLikedUseCase restaurantLikedUseCase;
 
@@ -35,15 +33,15 @@ public class RestaurantDetailViewModel extends ViewModel {
     public final LiveData<RestaurantLikedState> likedRestaurantState = _likedRestaurantState;
 
     public RestaurantDetailViewModel(
-            Application application,
             FavoriteRestaurantUseCase favoriteRestaurantUseCase,
             WorkMatesUseCase workMatesUseCase,
-            RestaurantLikedUseCase restaurantLikedUseCase) {
+            RestaurantLikedUseCase restaurantLikedUseCase,
+            PlaceRepository placeRepository) {
 
-        this.restaurantRepository = new RestaurantRepository(application);
         this.favoriteRestaurantUseCase = favoriteRestaurantUseCase;
         this.workMatesUseCase = workMatesUseCase;
         this.restaurantLikedUseCase = restaurantLikedUseCase;
+        this.placeRepository = placeRepository;
     }
 
     public void onLoadView() {
@@ -61,7 +59,7 @@ public class RestaurantDetailViewModel extends ViewModel {
     }
 
     public LiveData<RestaurantEntity> getRestaurant(String placeId) {
-        return restaurantRepository.getRestaurant(placeId);
+        return placeRepository.getRestaurant(placeId);
     }
 
     public void saveFavoriteRestaurant(RestaurantEntity restaurantEntity) {

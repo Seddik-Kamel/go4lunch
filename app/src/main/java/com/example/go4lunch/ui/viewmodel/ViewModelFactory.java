@@ -29,11 +29,9 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     private static FavoriteRestaurantRepository favoriteRestaurantRepository;
 
     private static ViewModelFactory viewModelFactory;
-    private final Application application;
 
     private ViewModelFactory(LocationRepository locationRepository, Application application) {
         ViewModelFactory.locationRepository = locationRepository;
-        this.application = application;
     }
 
 
@@ -45,17 +43,18 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
             return (T) new MainViewModel(
                     new NearRestaurantUseCase(locationRepository, placeRepository),
                     new RestaurantLikedUseCase(restaurantLikedRepository),
-                    new AutocompleteUseCase(placeAutocompleteRepository),application, locationRepository);
+                    new AutocompleteUseCase(placeAutocompleteRepository), locationRepository, placeRepository);
         }
         if (modelClass.isAssignableFrom(WorkMateViewModel.class)) {
             return (T) new WorkMateViewModel(new WorkMatesUseCase(workmateRepository));
         }
 
         if (modelClass.isAssignableFrom(RestaurantDetailViewModel.class))
-            return (T) new RestaurantDetailViewModel(application,
+            return (T) new RestaurantDetailViewModel(
                     new FavoriteRestaurantUseCase(favoriteRestaurantRepository),
                     new WorkMatesUseCase(workmateRepository),
-                    new RestaurantLikedUseCase(restaurantLikedRepository));
+                    new RestaurantLikedUseCase(restaurantLikedRepository),
+                    placeRepository);
 
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
     }

@@ -24,7 +24,6 @@ import com.bumptech.glide.request.RequestOptions;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityHomeScreenBinding;
 import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
-import com.example.go4lunch.infrastructure.repository.RestaurantRepository;
 import com.example.go4lunch.model.RestaurantModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
@@ -93,10 +92,6 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
     }
 
     private void render(MainPageState mainPageState) {
-        if (mainPageState instanceof NearRestaurantUpdateState) {
-            mainViewModel.insertRestaurant(((NearRestaurantUpdateState) mainPageState).getRestaurantModelArrayList());
-        }
-
         if (mainPageState instanceof AutocompleteState) {
             autocompleteLaunch.launch(((AutocompleteState) mainPageState).getIntent());
         }

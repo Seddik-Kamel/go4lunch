@@ -5,6 +5,7 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Update;
 
 import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
 
@@ -16,11 +17,14 @@ public interface RestaurantDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insert(RestaurantEntity restaurantEntity);
 
+    @Update
+    void update(RestaurantEntity restaurantEntity);
+
     @Query("DELETE FROM restaurant_table")
     void deleteAll();
 
     @Query("SELECT * FROM restaurant_table ORDER BY placeId ASC")
-    LiveData<List<RestaurantEntity>> getAlphabetizedRestaurant();
+    List<RestaurantEntity> getAlphabetizedRestaurant();
 
     @Query("SELECT * FROM restaurant_table WHERE placeId = :placeId")
     LiveData<RestaurantEntity> getRestaurant(String placeId);

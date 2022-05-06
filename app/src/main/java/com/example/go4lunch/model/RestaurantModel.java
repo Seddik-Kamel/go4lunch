@@ -26,6 +26,7 @@ public class RestaurantModel {
     private String phoneNumber;
     private String webSitUri;
     private Bitmap bitmap;
+    private byte[] bytesImage;
     private Integer userRatingTotal;
     private int userDistance;
     private PhotoMetadata photoMetadata;
@@ -43,7 +44,7 @@ public class RestaurantModel {
         restaurant.setPlaceId(place.getId());
         restaurant.setName(place.getName());
         restaurant.setUserRatingTotal(place.getUserRatingsTotal());
-        restaurant.setUserDistance(determineUserDistance(Objects.requireNonNull(place.getLatLng()), currentLocation.getLatitude(), currentLocation.getLongitude()));
+        //restaurant.setUserDistance(determineUserDistance(Objects.requireNonNull(place.getLatLng()), currentLocation.getLatitude(), currentLocation.getLongitude()));
         restaurant.setAddress(place.getAddress());
         restaurant.setRating(Objects.requireNonNull(place.getRating()).floatValue());
         restaurant.setMetadata(place.getPhotoMetadatas() != null ? place.getPhotoMetadatas().get(0) : null);
@@ -206,5 +207,13 @@ public class RestaurantModel {
 
     public void setMarkedColor(float markedColor) {
         this.markedColor = markedColor;
+    }
+
+    public byte[] getBytesImage() {
+        return bytesImage;
+    }
+
+    public void setBytesImage(byte[] bytesImage) {
+        this.bytesImage = bytesImage;
     }
 }

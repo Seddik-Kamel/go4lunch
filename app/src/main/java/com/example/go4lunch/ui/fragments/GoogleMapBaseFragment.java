@@ -31,6 +31,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapView;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
@@ -46,7 +47,6 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
 
     public MapView mapView;
     public boolean locationPermissionGranted = false;
-    private LocationEntity locationEntity;
 
     abstract int getActionBarTitle();
 
@@ -62,12 +62,9 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         mainViewModel = ViewModelFactory.getInstance(requireContext(), getActivity().getApplication()).obtainViewModel(MainViewModel.class);
-        //mainViewModel.onLoadView();
-
         mainViewModel.onLoadAutoComplete();
+        mainViewModel.onLoadView();
         mainViewModel.getLastLocationLiveData().observe(getActivity(), this::locationRender);
-        mainViewModel.getAllRestaurant().observe(getActivity(), this::restaurantRender);
-
 
         View view = inflater.inflate(R.layout.fragment_map_view, container, false);
         mapView = view.findViewById(R.id.mapView);
@@ -90,17 +87,11 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
 
     private void locationRender(LocationEntity locationEntity) {
         if (locationEntity != null) {
-            this.locationEntity = locationEntity;
             Location location = new Location("");
             location.setLongitude(locationEntity.getLongitude());
             location.setLatitude(locationEntity.getLatitude());
             lastKnowLocation = location;
         }
-    }
-
-    private void restaurantRender(List<RestaurantEntity> restaurantEntities) {
-        if (!restaurantEntities.isEmpty())
-            moveCameraOnPosition(RestaurantEntity.updateRestaurantModel(restaurantEntities));
     }
 
     public void render(MainPageState mainPageState) {
@@ -114,12 +105,11 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         }
     }
 
-
     @Override
     public void onMapReady(@NonNull GoogleMap googleMap) {
         map = googleMap;
         updateLocationUi();
-        //mainViewModel.state.observe(requireActivity(), this::render);
+        mainViewModel.state.observe(this, this::render);
     }
 
     @Override
@@ -184,9 +174,9 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
     private void addMarkers(ArrayList<RestaurantModel> restaurantList) {
         for (RestaurantModel restaurantModel : restaurantList) {
             getMap().addMarker(new MarkerOptions()
-                            .title(restaurantModel.getName())
-                            .position(restaurantModel.getLatLng())
-                    //.icon(BitmapDescriptorFactory.defaultMarker(restaurantModel.getMarkedColor()))
+                    .title(restaurantModel.getName())
+                    .position(restaurantModel.getLatLng())
+                    .icon(BitmapDescriptorFactory.defaultMarker(restaurantModel.getMarkedColor()))
             );
         }
     }

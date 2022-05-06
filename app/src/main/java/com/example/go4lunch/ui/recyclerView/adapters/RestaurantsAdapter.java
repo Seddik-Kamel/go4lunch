@@ -11,6 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.model.RestaurantModel;
 import com.example.go4lunch.ui.activity.HomeScreenActivity;
@@ -51,7 +52,13 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
         }
 
         holder.restaurantName.setText(restaurantModel.getName());
+
         holder.imageViewRestaurant.setImageBitmap(restaurantModel.getBitmap());
+
+        Glide.with(activity)
+                .load(restaurantModel.getBytesImage())
+                .into(holder.imageViewRestaurant);
+
         holder.textViewAddressRestaurant.setText(restaurantModel.getAddress());
         holder.itemRatingBar.setRating(restaurantModel.getRating());
         holder.itemUserRatingTotal.setText("( " + restaurantModel.getUserRatingTotal() + " )");

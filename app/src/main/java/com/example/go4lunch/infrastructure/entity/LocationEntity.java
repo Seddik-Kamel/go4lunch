@@ -28,7 +28,7 @@ public class LocationEntity {
         this.latitude = latitude;
     }
 
-    public boolean isLocationChanged(Location currentLocation) {
+    public boolean isNewLocation(Location currentLocation) {
         Location lastLocation = new Location("");
         lastLocation.setLongitude(longitude);
         lastLocation.setLatitude(latitude);

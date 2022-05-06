@@ -9,11 +9,15 @@ import java.util.ArrayList;
 
 public class NearRestaurantUpdateState implements MainPageState {
 
-    final Location currentLocation;
+    Location currentLocation;
     final ArrayList<RestaurantModel> restaurantModelArrayList;
 
     public NearRestaurantUpdateState(Location currentLocation, ArrayList<RestaurantModel> restaurantModelArrayList) {
         this.currentLocation = currentLocation;
+        this.restaurantModelArrayList = restaurantModelArrayList;
+    }
+
+    public NearRestaurantUpdateState( ArrayList<RestaurantModel> restaurantModelArrayList) {
         this.restaurantModelArrayList = restaurantModelArrayList;
     }
 

@@ -1,6 +1,5 @@
 package com.example.go4lunch.ui.viewmodel;
 
-import android.app.Application;
 import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
@@ -12,9 +11,9 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
 import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
-import com.example.go4lunch.infrastructure.repository.RestaurantRepository;
 import com.example.go4lunch.model.RestaurantModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
@@ -31,38 +30,36 @@ import java.util.List;
 
 public class MainViewModel extends ViewModel {
 
-
     private ArrayList<RestaurantModel> restaurantList = new ArrayList<>();
     private ArrayList<String> restaurantLikedList = new ArrayList<>();
-
     public final NearRestaurantUseCase nearRestaurantUseCase;
     public final AutocompleteUseCase autocompleteUseCase;
     public final RestaurantLikedUseCase restaurantLikedUseCase;
-    protected final RestaurantRepository restaurantRepository;
-    protected final LocationRepository locationRepository;
+    private final LocationRepository locationRepository;
+    private final PlaceRepository placeRepository;
 
     private final MutableLiveData<MainPageState> _state = new MutableLiveData<>();
     public final LiveData<MainPageState> state = _state;
 
     public MainViewModel(NearRestaurantUseCase nearRestaurantUseCase, RestaurantLikedUseCase restaurantLikedUseCase,
-                         AutocompleteUseCase autocompleteUseCase, Application application, LocationRepository locationRepository) {
+                         AutocompleteUseCase autocompleteUseCase, LocationRepository locationRepository, PlaceRepository placeRepository) {
         this.nearRestaurantUseCase = nearRestaurantUseCase;
         this.restaurantLikedUseCase = restaurantLikedUseCase;
         this.autocompleteUseCase = autocompleteUseCase;
-        this.restaurantRepository = new RestaurantRepository(application);
         this.locationRepository = locationRepository;
+        this.placeRepository = placeRepository;
     }
 
     public void onLoadView() {
         restaurantLikedUseCase.observeForever(restaurantLikedState -> {
             restaurantLikedList = restaurantLikedState.getRestaurantModelArrayList();
+
         });
 
         nearRestaurantUseCase.observeForever(nearRestaurants -> {
             restaurantList = nearRestaurants.getRestaurantModelArrayList();
-            updateLikedRestaurants(nearRestaurants.getRestaurantModelArrayList());
-            insertRestaurant(restaurantList);
-         //  _state.setValue(new NearRestaurantUpdateState(nearRestaurants.getCurrentLocation(), nearRestaurants.getRestaurantModelArrayList()));
+            updateLikedRestaurants(RestaurantEntity.updateRestaurantEntity(nearRestaurants.getRestaurantModelArrayList()));
+              _state.setValue(new NearRestaurantUpdateState(nearRestaurants.getCurrentLocation(), nearRestaurants.getRestaurantModelArrayList()));
         });
     }
 
@@ -98,27 +95,25 @@ public class MainViewModel extends ViewModel {
         autocompleteUseCase.updateRestaurant(restaurantModel);
     }
 
-    private void updateLikedRestaurants(@NonNull ArrayList<RestaurantModel> restaurantList) {
-        for (RestaurantModel restaurantModel : restaurantList) {
-            if (restaurantLikedList.contains(restaurantModel.getPlaceId())) {
-                restaurantModel.setMarkedColor(RestaurantModel.MARKET_COLOR_RESTAURANT_LIKED);
+    private void updateLikedRestaurants(@NonNull List<RestaurantEntity> restaurantList) {
+        for (RestaurantEntity restaurantEntity : restaurantList) {
+            if (restaurantLikedList.contains(restaurantEntity.getPlaceId() + FirebaseRepository.getUser().getUid())) {
+                restaurantEntity.setMarkedColor(RestaurantModel.MARKET_COLOR_RESTAURANT_LIKED);
             } else {
-                restaurantModel.setMarkedColor(RestaurantModel.DEFAULT_MARKET_COLOR);
+                restaurantEntity.setMarkedColor(RestaurantModel.DEFAULT_MARKET_COLOR);
             }
+
+            // update to local database
+          // update(restaurantEntity);// TODO à revoir.
         }
     }
 
-    public void insertRestaurant(ArrayList<RestaurantModel> restaurantEntities) {
-        for (RestaurantModel restaurantModel : restaurantEntities) {
-            restaurantRepository.insert(RestaurantEntity.updateData(restaurantModel));
-        }
-    }
 
-    public LiveData<List<RestaurantEntity>> getAllRestaurant() {
-        return restaurantRepository.getAllRestaurants();
-    }
-
-    public LiveData<LocationEntity> getLastLocationLiveData(){
+    public LiveData<LocationEntity> getLastLocationLiveData() {
         return locationRepository.getLastLocationLiveData();
+    }
+
+    public void update(RestaurantEntity restaurantEntity) {
+        placeRepository.update(restaurantEntity);
     }
 }

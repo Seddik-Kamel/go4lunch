@@ -26,7 +26,7 @@ public class RestaurantLikedRepository extends LiveData<ArrayList<String>> {
 
     public static RestaurantLikedRepository getInstance() {
         if (restaurantLikedRepository == null) {
-            synchronized (RestaurantRepository.class) {
+            synchronized (RestaurantLikedRepository.class) {
                 if (restaurantLikedRepository == null) {
                     restaurantLikedRepository = new RestaurantLikedRepository();
                 }

@@ -60,8 +60,8 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //placeId = getIntent().getStringExtra("placeId");
-        placeId = "ChIJhbeFtlPIlkcR83m5lfVPwB0";
+        placeId = getIntent().getStringExtra("placeId");
+       // placeId = "ChIJhbeFtlPIlkcR83m5lfVPwB0";
         initViewModel();
         initObservers();
         likePlace();
@@ -148,7 +148,6 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
     private void likePlace() {
         binding.floatingActionButtonLike.setOnClickListener(click -> {
-            // récupère cette fameuse liste.
             if (isLiked) {
                 String title = getResources().getString(R.string.alert_dialog_title);
                 String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
