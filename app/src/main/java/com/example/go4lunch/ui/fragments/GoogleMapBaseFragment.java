@@ -20,8 +20,7 @@ import androidx.core.app.ActivityCompat;
 
 import com.example.go4lunch.R;
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
 import com.example.go4lunch.state.NearRestaurantUpdateState;
@@ -36,7 +35,6 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMapReadyCallback {
 
@@ -147,7 +145,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         return map;
     }
 
-    private void moveCameraOnPosition(ArrayList<RestaurantModel> restaurants) {
+    private void moveCameraOnPosition(ArrayList<PlaceModel> restaurants) {
         if (lastKnowLocation != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM)
@@ -156,7 +154,7 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         }
     }
 
-    private void moveCameraOnThiSRestaurant(ArrayList<RestaurantModel> restaurants) {
+    private void moveCameraOnThiSRestaurant(ArrayList<PlaceModel> restaurants) {
         if (lastKnowLocation != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     restaurants.get(0).getLatLng(), DEFAULT_ZOOM)
@@ -171,12 +169,12 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
         mapView.getMapAsync(this);
     }
 
-    private void addMarkers(ArrayList<RestaurantModel> restaurantList) {
-        for (RestaurantModel restaurantModel : restaurantList) {
+    private void addMarkers(ArrayList<PlaceModel> restaurantList) {
+        for (PlaceModel placeModel : restaurantList) {
             getMap().addMarker(new MarkerOptions()
-                    .title(restaurantModel.getName())
-                    .position(restaurantModel.getLatLng())
-                    .icon(BitmapDescriptorFactory.defaultMarker(restaurantModel.getMarkedColor()))
+                    .title(placeModel.getName())
+                    .position(placeModel.getLatLng())
+                    .icon(BitmapDescriptorFactory.defaultMarker(placeModel.getMarkedColor()))
             );
         }
     }

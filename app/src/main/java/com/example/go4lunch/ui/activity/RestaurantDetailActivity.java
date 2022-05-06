@@ -21,7 +21,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityDetailsRestaurantsBinding;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.infrastructure.entity.PlaceEntity;
 import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.model.WorkmateModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
@@ -99,29 +99,29 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         }
     }
 
-    private void placeRender(RestaurantEntity restaurantEntity) {// from local database.
-        if (restaurantEntity != null) {
-            binding.restaurantName.setText(restaurantEntity.getName());
-            binding.restaurantAddress.setText(restaurantEntity.getAddress());
-            binding.restaurantRatingBar.setRating(restaurantEntity.getRating());
-            loadImageInView(restaurantEntity);
+    private void placeRender(PlaceEntity placeEntity) {// from local database.
+        if (placeEntity != null) {
+            binding.restaurantName.setText(placeEntity.getName());
+            binding.restaurantAddress.setText(placeEntity.getAddress());
+            binding.restaurantRatingBar.setRating(placeEntity.getRating());
+            loadImageInView(placeEntity);
 
-            if (hasNumberPhone(restaurantEntity.getPhoneNumber())) {
+            if (hasNumberPhone(placeEntity.getPhoneNumber())) {
                 binding.actionCall.setVisibility(View.VISIBLE);
                 binding.actionCallDisable.setVisibility(View.INVISIBLE);
                 binding.actionCall.setClickable(true);
-                phoneNumber = restaurantEntity.getPhoneNumber();
+                phoneNumber = placeEntity.getPhoneNumber();
                 binding.actionCall.setOnClickListener(v -> askPermissionAndCall(phoneNumber));
             }
 
-            if (hasALink(restaurantEntity.getWebSitUri())) {
+            if (hasALink(placeEntity.getWebSitUri())) {
                 binding.actionWeb.setVisibility(View.VISIBLE);
                 binding.actionNoWeb.setVisibility(View.GONE);
-                binding.actionWeb.setOnClickListener(action -> launchPageWeb(restaurantEntity.getWebSitUri()));
+                binding.actionWeb.setOnClickListener(action -> launchPageWeb(placeEntity.getWebSitUri()));
             }
 
             binding.actionNoStar.setOnClickListener(click -> {
-                restaurantDetailViewModel.saveFavoriteRestaurant(restaurantEntity);
+                restaurantDetailViewModel.saveFavoriteRestaurant(placeEntity);
                 restaurantDetailViewModel.updateFavoriteRestaurantListener(placeId);
             });
         }
@@ -205,9 +205,9 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         return phoneNumber != null;
     }
 
-    private void loadImageInView(RestaurantEntity restaurantEntity) {
+    private void loadImageInView(PlaceEntity placeEntity) {
         Glide.with(getApplicationContext())
-                .load(restaurantEntity.getImage())
+                .load(placeEntity.getImage())
                 .into(binding.imageView);
     }
 

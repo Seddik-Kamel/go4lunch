@@ -8,10 +8,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.libraries.places.api.model.PhotoMetadata;
 import com.google.android.libraries.places.api.model.Place;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
-public class RestaurantModel {
+public class PlaceModel {
 
     private long id;
     private String placeId;
@@ -35,16 +34,16 @@ public class RestaurantModel {
     public static final float DEFAULT_MARKET_COLOR = BitmapDescriptorFactory.HUE_ORANGE;
     public static final float MARKET_COLOR_RESTAURANT_LIKED = BitmapDescriptorFactory.HUE_GREEN;
 
-    public RestaurantModel() {
+    public PlaceModel() {
 
     }
 
-    public static RestaurantModel fromPlace(Place place, Location currentLocation) {
-        RestaurantModel restaurant = new RestaurantModel();
+    public static PlaceModel fromPlace(Place place, Location currentLocation) {
+        PlaceModel restaurant = new PlaceModel();
         restaurant.setPlaceId(place.getId());
         restaurant.setName(place.getName());
         restaurant.setUserRatingTotal(place.getUserRatingsTotal());
-        //restaurant.setUserDistance(determineUserDistance(Objects.requireNonNull(place.getLatLng()), currentLocation.getLatitude(), currentLocation.getLongitude()));
+        restaurant.setUserDistance(determineUserDistance(Objects.requireNonNull(place.getLatLng()), currentLocation.getLatitude(), currentLocation.getLongitude()));
         restaurant.setAddress(place.getAddress());
         restaurant.setRating(Objects.requireNonNull(place.getRating()).floatValue());
         restaurant.setMetadata(place.getPhotoMetadatas() != null ? place.getPhotoMetadatas().get(0) : null);
@@ -60,16 +59,6 @@ public class RestaurantModel {
         restaurantLocation.setLatitude(place.latitude);
         restaurantLocation.setLongitude(place.longitude);
         return (int) currentLocation.distanceTo(restaurantLocation);
-    }
-
-    public static void determineMarketColor(ArrayList<RestaurantModel> restaurantList, ArrayList<String> restaurantLikedList) {
-        for (RestaurantModel restaurantModel : restaurantList) {
-            if (restaurantLikedList.contains(restaurantModel.getPlaceId())) {
-                restaurantModel.setMarkedColor(MARKET_COLOR_RESTAURANT_LIKED);
-            } else {
-                restaurantModel.setMarkedColor(DEFAULT_MARKET_COLOR);
-            }
-        }
     }
 
     public long getId() {

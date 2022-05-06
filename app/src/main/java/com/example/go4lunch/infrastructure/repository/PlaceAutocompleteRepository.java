@@ -4,8 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.example.go4lunch.R;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.model.PlaceModel;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.android.libraries.places.api.model.Place;
@@ -13,9 +12,7 @@ import com.google.android.libraries.places.api.net.FetchPlaceRequest;
 import com.google.android.libraries.places.api.net.FetchPlaceResponse;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 public class PlaceAutocompleteRepository extends PlaceRepository {
 
@@ -43,15 +40,15 @@ public class PlaceAutocompleteRepository extends PlaceRepository {
 
     //TODO Partie à revoir.
 
-    protected ArrayList<RestaurantModel> retrieveDetailsPlaceAutocomplete(Task<ArrayList<RestaurantModel>> continuation) {
-        ArrayList<RestaurantModel> restaurants = continuation.getResult();
-        for (RestaurantModel restaurant : restaurants) {
+    protected ArrayList<PlaceModel> retrieveDetailsPlaceAutocomplete(Task<ArrayList<PlaceModel>> continuation) {
+        ArrayList<PlaceModel> restaurants = continuation.getResult();
+        for (PlaceModel restaurant : restaurants) {
             tryFetchPlaceDetailsAutocomplete(restaurant);
         }
         return restaurants;
     }
 
-    protected void tryFetchPlaceDetailsAutocomplete(RestaurantModel restaurant) {
+    protected void tryFetchPlaceDetailsAutocomplete(PlaceModel restaurant) {
         Task<FetchPlaceResponse> fetchPlaceResponseTask = placesClient.fetchPlace(FetchPlaceRequest.builder(restaurant.getPlaceId(), requestDetailFields).build());
         try {
             FetchPlaceResponse placeResponse = Tasks.await(fetchPlaceResponseTask);
@@ -61,7 +58,7 @@ public class PlaceAutocompleteRepository extends PlaceRepository {
         }
     }
 
-    protected void updateRestaurantWithPlaceResponseAutocomplete(RestaurantModel restaurant, FetchPlaceResponse placeResponse) {
+    protected void updateRestaurantWithPlaceResponseAutocomplete(PlaceModel restaurant, FetchPlaceResponse placeResponse) {
         Place place = placeResponse.getPlace();
         restaurant.setWebSitUrl(place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null);
         restaurant.setPhoneNumber(place.getPhoneNumber());
@@ -69,12 +66,12 @@ public class PlaceAutocompleteRepository extends PlaceRepository {
         restaurant.setIsOpen(place.isOpen() != null ? place.isOpen() ? context.getString(R.string.place_open) : context.getString(R.string.place_close) : unknownInformation);
     }
 
-    public void updateRestaurant(RestaurantModel restaurantModel) {
-        if (restaurantModel.getPhotoMetadata() != null) {
-            generateFetchPhotoTask(restaurantModel)
+    public void updateRestaurant(PlaceModel placeModel) {
+        if (placeModel.getPhotoMetadata() != null) {
+            generateFetchPhotoTask(placeModel)
                     .continueWith(executor, result -> {
-                        restaurantModel.setBitmap(result.getResult().getBitmap());
-                        return new ArrayList<>(Collections.singletonList(restaurantModel));
+                        placeModel.setBitmap(result.getResult().getBitmap());
+                        return new ArrayList<>(Collections.singletonList(placeModel));
                     })
                     .continueWith(executor, this::retrieveDetailsPlaceAutocomplete)
                     .addOnCompleteListener(this::updateListeners);

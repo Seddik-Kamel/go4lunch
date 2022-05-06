@@ -12,10 +12,10 @@ import androidx.lifecycle.LiveData;
 
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
-import com.example.go4lunch.infrastructure.dao.RestaurantDao;
+import com.example.go4lunch.infrastructure.dao.PlaceDao;
 import com.example.go4lunch.infrastructure.database.GoLunchDatabase;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.infrastructure.entity.PlaceEntity;
+import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.LocationState;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
@@ -38,7 +38,7 @@ import java.util.Objects;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
+public class PlaceRepository extends LiveData<ArrayList<PlaceModel>> {
 
     protected static PlaceRepository placeRepository = null;
     protected final PlacesClient placesClient;
@@ -46,7 +46,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
     protected final Context context;
     protected final LocationRepository locationRepository;
     protected final Executor executor = Executors.newSingleThreadExecutor();
-    private final RestaurantDao restaurantDao;
+    private final PlaceDao placeDao;
     private LocationState locationState;
 
     public static final List<Place.Field> autocompleteField = Arrays.asList(
@@ -78,7 +78,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
 
     protected PlaceRepository(Context context, Application application, LocationRepository locationRepository) {
         GoLunchDatabase goLunchDatabase = GoLunchDatabase.getDatabase(application);
-        this.restaurantDao = goLunchDatabase.restaurantDao();
+        this.placeDao = goLunchDatabase.restaurantDao();
         this.context = context.getApplicationContext();
         Places.initialize(context, BuildConfig.API_KEY);
         placesClient = Places.createClient(this.context);
@@ -109,7 +109,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
                 findPlacesWithPermissions();
                 this.locationState = locationState;
             } else
-                GoLunchDatabase.databaseWriteExecutor.execute(() -> postValue(RestaurantEntity.updateRestaurantModel(getAllRestaurants())));
+                GoLunchDatabase.databaseWriteExecutor.execute(() -> postValue(PlaceEntity.updateRestaurantModel(getAllRestaurants())));
         }
     }
 
@@ -124,8 +124,8 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
                 .addOnCompleteListener(this::updateListeners);
     }
 
-    private ArrayList<RestaurantModel> convertAndFilterCurrentPlaceResponseToRestaurants(Task<FindCurrentPlaceResponse> task) {
-        final ArrayList<RestaurantModel> restaurants = new ArrayList<>();
+    private ArrayList<PlaceModel> convertAndFilterCurrentPlaceResponseToRestaurants(Task<FindCurrentPlaceResponse> task) {
+        final ArrayList<PlaceModel> restaurants = new ArrayList<>();
         if (task.isSuccessful()) {
             filterResults(task.getResult(), restaurants);
 
@@ -145,33 +145,33 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         }
     }
 
-    protected void updateListeners(Task<ArrayList<RestaurantModel>> task) {
+    protected void updateListeners(Task<ArrayList<PlaceModel>> task) {
         if (task.isSuccessful())
             setValue(task.getResult());
     }
 
-    private void filterResults(FindCurrentPlaceResponse response, ArrayList<RestaurantModel> restaurants) {
+    private void filterResults(FindCurrentPlaceResponse response, ArrayList<PlaceModel> restaurants) {
         for (PlaceLikelihood placeLikelihood : response.getPlaceLikelihoods()) {
             final List<Place.Type> types = Objects.requireNonNull(placeLikelihood.getPlace().getTypes());
             if (types.contains(Place.Type.RESTAURANT) || types.contains(Place.Type.FOOD)) {
-                restaurants.add(RestaurantModel.fromPlace(placeLikelihood.getPlace(), locationState.getCurrentLocation()));
+                restaurants.add(PlaceModel.fromPlace(placeLikelihood.getPlace(), locationState.getCurrentLocation()));
             }
         }
     }
 
-    protected ArrayList<RestaurantModel> retrieveDetailsRestaurantsFromDetailsApi(Task<ArrayList<RestaurantModel>> continuation) {
-        ArrayList<RestaurantModel> restaurants = continuation.getResult();
+    protected ArrayList<PlaceModel> retrieveDetailsRestaurantsFromDetailsApi(Task<ArrayList<PlaceModel>> continuation) {
+        ArrayList<PlaceModel> restaurants = continuation.getResult();
 
         // Delete from local database.
         deleteAll();
 
-        for (RestaurantModel restaurant : restaurants) {
+        for (PlaceModel restaurant : restaurants) {
             tryFetchPlaceDetails(restaurant);
         }
         return restaurants;
     }
 
-    protected void tryFetchPlaceDetails(RestaurantModel restaurant) {
+    protected void tryFetchPlaceDetails(PlaceModel restaurant) {
         Task<FetchPlaceResponse> fetchPlaceResponseTask = placesClient.fetchPlace(FetchPlaceRequest.builder(restaurant.getPlaceId(), requestDetailFields).build());
         try {
             FetchPlaceResponse placeResponse = Tasks.await(fetchPlaceResponseTask);
@@ -181,7 +181,7 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         }
     }
 
-    protected void updateRestaurantWithPlaceResponse(RestaurantModel restaurant, FetchPlaceResponse placeResponse) {
+    protected void updateRestaurantWithPlaceResponse(PlaceModel restaurant, FetchPlaceResponse placeResponse) {
         Place place = placeResponse.getPlace();
         restaurant.setWebSitUrl(place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null);
         restaurant.setPhoneNumber(place.getPhoneNumber());
@@ -189,21 +189,21 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
         restaurant.setIsOpen(place.isOpen() != null ? place.isOpen() ? context.getString(R.string.place_open) : context.getString(R.string.place_close) : unknownInformation);
 
        //Insert to local database
-        RestaurantEntity restaurantEntity = RestaurantEntity.updateData(restaurant);
-        insert(restaurantEntity);
+        PlaceEntity placeEntity = PlaceEntity.updateData(restaurant);
+        insert(placeEntity);
     }
 
     @NonNull
-    protected ArrayList<RestaurantModel> retrievePhotoRestaurantsFromPhotoApi(Task<ArrayList<RestaurantModel>> continuation) {
-        ArrayList<RestaurantModel> restaurants = continuation.getResult();
-        for (RestaurantModel restaurant : restaurants)
+    protected ArrayList<PlaceModel> retrievePhotoRestaurantsFromPhotoApi(Task<ArrayList<PlaceModel>> continuation) {
+        ArrayList<PlaceModel> restaurants = continuation.getResult();
+        for (PlaceModel restaurant : restaurants)
             if (restaurant.getPhotoMetadata() != null)
                 tryFetchRestaurantImage(restaurant);
 
         return restaurants;
     }
 
-    private void tryFetchRestaurantImage(RestaurantModel restaurant) {
+    private void tryFetchRestaurantImage(PlaceModel restaurant) {
         Task<FetchPhotoResponse> fetchPhotoResponseTask = placesClient.fetchPhoto(FetchPhotoRequest.builder(restaurant.getPhotoMetadata()).build());
         try {
             FetchPhotoResponse placeResponse = Tasks.await(fetchPhotoResponseTask);
@@ -218,29 +218,29 @@ public class PlaceRepository extends LiveData<ArrayList<RestaurantModel>> {
     }
 
     @NonNull
-    protected Task<FetchPhotoResponse> generateFetchPhotoTask(RestaurantModel restaurant) {
+    protected Task<FetchPhotoResponse> generateFetchPhotoTask(PlaceModel restaurant) {
         return placesClient.fetchPhoto(
                 FetchPhotoRequest.builder(restaurant.getPhotoMetadata()).build());
     }
 
     // Locale database
-    public List<RestaurantEntity> getAllRestaurants() {
-        return restaurantDao.getAlphabetizedRestaurant();
+    public List<PlaceEntity> getAllRestaurants() {
+        return placeDao.getAlphabetizedRestaurant();
     }
 
-    public LiveData<RestaurantEntity> getRestaurant(String placeId) {
-        return restaurantDao.getRestaurant(placeId);
+    public LiveData<PlaceEntity> getRestaurant(String placeId) {
+        return placeDao.getRestaurant(placeId);
     }
 
-    public void insert(RestaurantEntity restaurantEntity) {
-        GoLunchDatabase.databaseWriteExecutor.execute(() -> restaurantDao.insert(restaurantEntity));
+    public void insert(PlaceEntity placeEntity) {
+        GoLunchDatabase.databaseWriteExecutor.execute(() -> placeDao.insert(placeEntity));
     }
 
     public void deleteAll() {
-        GoLunchDatabase.databaseWriteExecutor.execute(restaurantDao::deleteAll);
+        GoLunchDatabase.databaseWriteExecutor.execute(placeDao::deleteAll);
     }
 
-    public void update(RestaurantEntity restaurantEntity){
-        GoLunchDatabase.databaseWriteExecutor.execute(() -> restaurantDao.update(restaurantEntity));
+    public void update(PlaceEntity placeEntity){
+        GoLunchDatabase.databaseWriteExecutor.execute(() -> placeDao.update(placeEntity));
     }
 }

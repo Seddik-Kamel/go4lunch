@@ -7,7 +7,7 @@ import androidx.lifecycle.MediatorLiveData;
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.LocationState;
 import com.example.go4lunch.state.NearRestaurantUpdateState;
 import com.google.android.libraries.places.api.net.PlacesClient;
@@ -18,7 +18,7 @@ public class NearRestaurantUseCase extends MediatorLiveData<NearRestaurantUpdate
 
     private Location currentLocation;
 
-    private ArrayList<RestaurantModel> restaurantModelArrayList;
+    private ArrayList<PlaceModel> placeModelArrayList;
     private final LocationRepository locationRepository;
     private final PlaceRepository placeRepository;
     private  LocationState locationState;
@@ -35,16 +35,16 @@ public class NearRestaurantUseCase extends MediatorLiveData<NearRestaurantUpdate
 
 
         addSource(placeRepository, (source) -> {
-            if (!source.equals(restaurantModelArrayList)) {
-                restaurantModelArrayList = source;
+            if (!source.equals(placeModelArrayList)) {
+                placeModelArrayList = source;
                 notifyObserver();
             }
         });
     }
 
     public void notifyObserver() {
-        if (locationState != null && restaurantModelArrayList != null)
-            setValue(new NearRestaurantUpdateState(locationState.getCurrentLocation(), restaurantModelArrayList));
+        if (locationState != null && placeModelArrayList != null)
+            setValue(new NearRestaurantUpdateState(locationState.getCurrentLocation(), placeModelArrayList));
     }
 
     public void startService() {

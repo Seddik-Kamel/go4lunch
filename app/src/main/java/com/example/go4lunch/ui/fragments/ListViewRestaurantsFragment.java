@@ -13,8 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.go4lunch.BuildConfig;
 import com.example.go4lunch.R;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
 import com.example.go4lunch.state.NearRestaurantUpdateState;
@@ -80,7 +79,7 @@ public class ListViewRestaurantsFragment extends BaseFragment {
         return R.layout.fragment_list_view_restaurants;
     }
 
-    private void initRecyclerView(List<RestaurantModel> restaurantList) {
+    private void initRecyclerView(List<PlaceModel> restaurantList) {
         RestaurantsAdapter adapter = new RestaurantsAdapter(restaurantList, getActivity());
         recyclerView.setAdapter(adapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));

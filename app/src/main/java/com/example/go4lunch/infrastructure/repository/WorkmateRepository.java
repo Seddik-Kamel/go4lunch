@@ -29,7 +29,6 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
 
     private static final String USER_COLLECTION_NAME = "users";
     private static final String RESTAURANT_COLLECTION_NAME = "restaurant_liked_by_workmate";
-    private static final String FAVORITE_RESTAURANT = "favorite_restaurant";
 
     public static final String PLACE_ID_LIKED = "placeIdLiked";
 
@@ -43,10 +42,6 @@ public class WorkmateRepository extends LiveData<ArrayList<WorkmateModel>> {
 
     private CollectionReference getRestaurantLikedByWorkmateCollection() {
         return FirebaseFirestore.getInstance().collection(RESTAURANT_COLLECTION_NAME);
-    }
-
-    private CollectionReference getFavoriteRestaurantCollection() {
-        return FirebaseFirestore.getInstance().collection(FAVORITE_RESTAURANT);
     }
 
     public static WorkmateRepository getInstance() {

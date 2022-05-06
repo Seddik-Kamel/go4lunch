@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
 
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
 
 @Dao
 public interface LocationDao {

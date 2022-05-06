@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
-import com.example.go4lunch.model.RestaurantModel;
+import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.ui.activity.HomeScreenActivity;
 import com.example.go4lunch.ui.recyclerView.viewHolder.RestaurantsViewHolder;
 
@@ -22,11 +22,11 @@ import java.util.List;
 
 public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHolder> implements Filterable {
 
-    public final List<RestaurantModel> restaurantList;
+    public final List<PlaceModel> restaurantList;
     private final FragmentActivity activity;
-    private List<RestaurantModel> restaurantFiltered;
+    private List<PlaceModel> restaurantFiltered;
 
-    public RestaurantsAdapter(List<RestaurantModel> restaurantList, FragmentActivity activity) {
+    public RestaurantsAdapter(List<PlaceModel> restaurantList, FragmentActivity activity) {
         this.activity = activity;
         this.restaurantList = restaurantList;
         this.restaurantFiltered = restaurantList;
@@ -43,28 +43,28 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
 
     @Override
     public void onBindViewHolder(@NonNull RestaurantsViewHolder holder, int position) {
-        RestaurantModel restaurantModel = restaurantFiltered.get(position);
+        PlaceModel placeModel = restaurantFiltered.get(position);
 
-        if (restaurantModel.isOpen().equals(activity.getResources().getString(R.string.place_open))) {
+        if (placeModel.isOpen().equals(activity.getResources().getString(R.string.place_open))) {
             holder.itemRestaurantOpen.setTextColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.colorGreen));
         } else {
             holder.itemRestaurantOpen.setTextColor(ContextCompat.getColor(activity.getApplicationContext(), R.color.colorError));
         }
 
-        holder.restaurantName.setText(restaurantModel.getName());
+        holder.restaurantName.setText(placeModel.getName());
 
-        holder.imageViewRestaurant.setImageBitmap(restaurantModel.getBitmap());
+        holder.imageViewRestaurant.setImageBitmap(placeModel.getBitmap());
 
         Glide.with(activity)
-                .load(restaurantModel.getBytesImage())
+                .load(placeModel.getBytesImage())
                 .into(holder.imageViewRestaurant);
 
-        holder.textViewAddressRestaurant.setText(restaurantModel.getAddress());
-        holder.itemRatingBar.setRating(restaurantModel.getRating());
-        holder.itemUserRatingTotal.setText("( " + restaurantModel.getUserRatingTotal() + " )");
-        holder.itemDistance.setText(restaurantModel.getUserDistance() + " m ");
-        holder.itemRestaurantOpen.setText(restaurantModel.isOpen());
-        holder.itemView.setOnClickListener(v -> ((HomeScreenActivity) activity).startRestaurantDetailActivity(restaurantModel.getPlaceId()));
+        holder.textViewAddressRestaurant.setText(placeModel.getAddress());
+        holder.itemRatingBar.setRating(placeModel.getRating());
+        holder.itemUserRatingTotal.setText("( " + placeModel.getUserRatingTotal() + " )");
+        holder.itemDistance.setText(placeModel.getUserDistance() + " m ");
+        holder.itemRestaurantOpen.setText(placeModel.isOpen());
+        holder.itemView.setOnClickListener(v -> ((HomeScreenActivity) activity).startRestaurantDetailActivity(placeModel.getPlaceId()));
     }
 
     @Override
@@ -85,8 +85,8 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
                 if (charString.isEmpty()) {
                     restaurantFiltered = restaurantList;
                 } else {
-                    List<RestaurantModel> filteredList = new ArrayList<>();
-                    for (RestaurantModel row : restaurantList) {
+                    List<PlaceModel> filteredList = new ArrayList<>();
+                    for (PlaceModel row : restaurantList) {
 
                         // name match condition. this might differ depending on your requirement
                         // here we are looking for name or phone number match
@@ -106,7 +106,7 @@ public class RestaurantsAdapter extends RecyclerView.Adapter<RestaurantsViewHold
 
             @Override
             protected void publishResults(CharSequence constraint, FilterResults results) {
-                restaurantFiltered = (ArrayList<RestaurantModel>) results.values;
+                restaurantFiltered = (ArrayList<PlaceModel>) results.values;
                 notifyDataSetChanged();
             }
         };

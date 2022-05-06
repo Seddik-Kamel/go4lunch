@@ -7,11 +7,11 @@ import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.example.go4lunch.infrastructure.repository.FavoriteRestaurantRepository;
+import com.example.go4lunch.infrastructure.repository.FavoritePlacesRepository;
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceAutocompleteRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
-import com.example.go4lunch.infrastructure.repository.RestaurantLikedRepository;
+import com.example.go4lunch.infrastructure.repository.PlaceLikedRepository;
 import com.example.go4lunch.infrastructure.repository.WorkmateRepository;
 import com.example.go4lunch.usecase.AutocompleteUseCase;
 import com.example.go4lunch.usecase.FavoriteRestaurantUseCase;
@@ -25,8 +25,8 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
     private static PlaceRepository placeRepository;
     private static PlaceAutocompleteRepository placeAutocompleteRepository;
     private static WorkmateRepository workmateRepository;
-    private static RestaurantLikedRepository restaurantLikedRepository;
-    private static FavoriteRestaurantRepository favoriteRestaurantRepository;
+    private static PlaceLikedRepository placeLikedRepository;
+    private static FavoritePlacesRepository favoritePlacesRepository;
 
     private static ViewModelFactory viewModelFactory;
 
@@ -42,7 +42,7 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
         if (modelClass.isAssignableFrom(MainViewModel.class)) {
             return (T) new MainViewModel(
                     new NearRestaurantUseCase(locationRepository, placeRepository),
-                    new RestaurantLikedUseCase(restaurantLikedRepository),
+                    new RestaurantLikedUseCase(placeLikedRepository),
                     new AutocompleteUseCase(placeAutocompleteRepository), locationRepository, placeRepository);
         }
         if (modelClass.isAssignableFrom(WorkMateViewModel.class)) {
@@ -51,9 +51,9 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
 
         if (modelClass.isAssignableFrom(RestaurantDetailViewModel.class))
             return (T) new RestaurantDetailViewModel(
-                    new FavoriteRestaurantUseCase(favoriteRestaurantRepository),
+                    new FavoriteRestaurantUseCase(favoritePlacesRepository),
                     new WorkMatesUseCase(workmateRepository),
-                    new RestaurantLikedUseCase(restaurantLikedRepository),
+                    new RestaurantLikedUseCase(placeLikedRepository),
                     placeRepository);
 
         throw new IllegalArgumentException("Unknown ViewModel class: " + modelClass.getName());
@@ -74,8 +74,8 @@ public class ViewModelFactory extends ViewModelProvider.NewInstanceFactory {
                     }
 
                     workmateRepository = WorkmateRepository.getInstance();
-                    restaurantLikedRepository = RestaurantLikedRepository.getInstance();
-                    favoriteRestaurantRepository = FavoriteRestaurantRepository.getInstance();
+                    placeLikedRepository = PlaceLikedRepository.getInstance();
+                    favoritePlacesRepository = FavoritePlacesRepository.getInstance();
                 }
 
             }

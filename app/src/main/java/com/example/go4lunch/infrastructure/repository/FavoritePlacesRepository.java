@@ -5,7 +5,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.lifecycle.LiveData;
 
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.infrastructure.entity.PlaceEntity;
 import com.example.go4lunch.model.FavoriteRestaurantModel;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -14,22 +14,22 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
-public class FavoriteRestaurantRepository extends LiveData<ArrayList<FavoriteRestaurantModel>> {
+public class FavoritePlacesRepository extends LiveData<ArrayList<FavoriteRestaurantModel>> {
 
     private static final String FAVORITE_RESTAURANT = "favorite_restaurant";
-    private static FavoriteRestaurantRepository instance;
+    private static FavoritePlacesRepository instance;
 
     private CollectionReference getFavoriteRestaurantCollection() {
         return FirebaseFirestore.getInstance().collection(FAVORITE_RESTAURANT);
     }
 
-    public static FavoriteRestaurantRepository getInstance() {
-        FavoriteRestaurantRepository result = instance;
+    public static FavoritePlacesRepository getInstance() {
+        FavoritePlacesRepository result = instance;
         if (result != null)
             return instance;
-        synchronized (FavoriteRestaurantRepository.class) {
+        synchronized (FavoritePlacesRepository.class) {
             if (instance == null) {
-                instance = new FavoriteRestaurantRepository();
+                instance = new FavoritePlacesRepository();
             }
         }
         return instance;
@@ -46,9 +46,9 @@ public class FavoriteRestaurantRepository extends LiveData<ArrayList<FavoriteRes
         return (user != null) ? user.getUid() : null;
     }
 
-    public void saveFavoriteRestaurantByWorkmate(RestaurantEntity restaurantEntity) {
-        FavoriteRestaurantModel favoriteRestaurantModel = new FavoriteRestaurantModel(restaurantEntity.getName(), restaurantEntity.getPlaceId(), getCurrentUserUID());
-        String documentId = getCurrentUserUID() + "_" + restaurantEntity.getPlaceId();
+    public void saveFavoriteRestaurantByWorkmate(PlaceEntity placeEntity) {
+        FavoriteRestaurantModel favoriteRestaurantModel = new FavoriteRestaurantModel(placeEntity.getName(), placeEntity.getPlaceId(), getCurrentUserUID());
+        String documentId = getCurrentUserUID() + "_" + placeEntity.getPlaceId();
         getFavoriteRestaurantCollection()
                 .document(documentId)
                 .set(favoriteRestaurantModel)

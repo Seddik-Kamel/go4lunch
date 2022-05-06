@@ -2,8 +2,8 @@ package com.example.go4lunch.usecase;
 
 import androidx.lifecycle.MediatorLiveData;
 
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
-import com.example.go4lunch.infrastructure.repository.FavoriteRestaurantRepository;
+import com.example.go4lunch.infrastructure.entity.PlaceEntity;
+import com.example.go4lunch.infrastructure.repository.FavoritePlacesRepository;
 import com.example.go4lunch.model.FavoriteRestaurantModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
 
@@ -13,11 +13,11 @@ public class FavoriteRestaurantUseCase extends MediatorLiveData<FavoriteRestaura
 
     private ArrayList<FavoriteRestaurantModel> favoriteRestaurantModel;
 
-    private final FavoriteRestaurantRepository favoriteRestaurantRepository;
+    private final FavoritePlacesRepository favoritePlacesRepository;
 
-    public FavoriteRestaurantUseCase(FavoriteRestaurantRepository favoriteRestaurantRepository) {
-        this.favoriteRestaurantRepository = favoriteRestaurantRepository;
-        addSource(favoriteRestaurantRepository, (source) -> {
+    public FavoriteRestaurantUseCase(FavoritePlacesRepository favoritePlacesRepository) {
+        this.favoritePlacesRepository = favoritePlacesRepository;
+        addSource(favoritePlacesRepository, (source) -> {
             favoriteRestaurantModel = source;
             notifyObserver();
         });
@@ -27,15 +27,15 @@ public class FavoriteRestaurantUseCase extends MediatorLiveData<FavoriteRestaura
         setValue(new FavoriteRestaurantState(favoriteRestaurantModel));
     }
 
-    public void saveFavoriteRestaurant(RestaurantEntity restaurantEntity) {
-        favoriteRestaurantRepository.saveFavoriteRestaurantByWorkmate(restaurantEntity);
+    public void saveFavoriteRestaurant(PlaceEntity placeEntity) {
+        favoritePlacesRepository.saveFavoriteRestaurantByWorkmate(placeEntity);
     }
 
     public void deleteFavoriteRestaurant(String placeId) {
-        favoriteRestaurantRepository.deleteFavoriteRestaurant(placeId);
+        favoritePlacesRepository.deleteFavoriteRestaurant(placeId);
     }
 
     public void updateFavoriteRestaurantListener(String placeId) {
-        favoriteRestaurantRepository.updateFavoriteRestaurantListener(placeId);
+        favoritePlacesRepository.updateFavoriteRestaurantListener(placeId);
     }
 }

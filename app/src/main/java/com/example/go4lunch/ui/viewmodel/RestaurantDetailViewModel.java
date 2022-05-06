@@ -4,7 +4,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
-import com.example.go4lunch.infrastructure.entity.RestaurantEntity;
+import com.example.go4lunch.infrastructure.entity.PlaceEntity;
 import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
 import com.example.go4lunch.model.FavoriteRestaurantModel;
@@ -58,12 +58,12 @@ public class RestaurantDetailViewModel extends ViewModel {
         });
     }
 
-    public LiveData<RestaurantEntity> getRestaurant(String placeId) {
+    public LiveData<PlaceEntity> getRestaurant(String placeId) {
         return placeRepository.getRestaurant(placeId);
     }
 
-    public void saveFavoriteRestaurant(RestaurantEntity restaurantEntity) {
-        favoriteRestaurantUseCase.saveFavoriteRestaurant(restaurantEntity);
+    public void saveFavoriteRestaurant(PlaceEntity placeEntity) {
+        favoriteRestaurantUseCase.saveFavoriteRestaurant(placeEntity);
     }
 
     public void deleteFavoriteRestaurant(String placeId) {

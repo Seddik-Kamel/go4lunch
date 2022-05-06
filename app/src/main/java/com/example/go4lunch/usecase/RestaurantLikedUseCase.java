@@ -2,7 +2,7 @@ package com.example.go4lunch.usecase;
 
 import androidx.lifecycle.MediatorLiveData;
 
-import com.example.go4lunch.infrastructure.repository.RestaurantLikedRepository;
+import com.example.go4lunch.infrastructure.repository.PlaceLikedRepository;
 import com.example.go4lunch.state.RestaurantLikedState;
 
 import java.util.ArrayList;
@@ -10,11 +10,11 @@ import java.util.ArrayList;
 public class RestaurantLikedUseCase extends MediatorLiveData<RestaurantLikedState> {
 
     private ArrayList<String> restaurantModelArrayList;
-    private final RestaurantLikedRepository restaurantLikedRepository;
+    private final PlaceLikedRepository placeLikedRepository;
 
-    public RestaurantLikedUseCase(RestaurantLikedRepository restaurantLikedRepository) {
-        this.restaurantLikedRepository = restaurantLikedRepository;
-        addSource(restaurantLikedRepository, (source) -> {
+    public RestaurantLikedUseCase(PlaceLikedRepository placeLikedRepository) {
+        this.placeLikedRepository = placeLikedRepository;
+        addSource(placeLikedRepository, (source) -> {
             restaurantModelArrayList = source;
             notifyObserver();
 
@@ -27,14 +27,14 @@ public class RestaurantLikedUseCase extends MediatorLiveData<RestaurantLikedStat
     }
 
     public void saveRestaurantsLiked(String placeId) {
-        restaurantLikedRepository.saveRestaurantsLiked(placeId);
+        placeLikedRepository.saveRestaurantsLiked(placeId);
     }
 
     public void deleteRestaurantLiked(String placeId) {
-        restaurantLikedRepository.deleteRestaurantLikedByWorkmate(placeId);
+        placeLikedRepository.deleteRestaurantLikedByWorkmate(placeId);
     }
 
     public void getRestaurantsLiked(String placeId) {
-        restaurantLikedRepository.getRestaurantsLiked(placeId);
+        placeLikedRepository.getRestaurantsLiked(placeId);
     }
 }

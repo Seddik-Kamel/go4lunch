@@ -11,28 +11,28 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 
-public class RestaurantLikedRepository extends LiveData<ArrayList<String>> {
+public class PlaceLikedRepository extends LiveData<ArrayList<String>> {
 
-    private static RestaurantLikedRepository restaurantLikedRepository;
+    private static PlaceLikedRepository placeLikedRepository;
     private static final String RESTAURANT_LIKED = "restaurant_liked";
 
     private CollectionReference getRestaurantLikedCollection() {
         return FirebaseFirestore.getInstance().collection(RESTAURANT_LIKED);
     }
 
-    public RestaurantLikedRepository() {
+    public PlaceLikedRepository() {
         addWorkmateSnapShotListener();
     }
 
-    public static RestaurantLikedRepository getInstance() {
-        if (restaurantLikedRepository == null) {
-            synchronized (RestaurantLikedRepository.class) {
-                if (restaurantLikedRepository == null) {
-                    restaurantLikedRepository = new RestaurantLikedRepository();
+    public static PlaceLikedRepository getInstance() {
+        if (placeLikedRepository == null) {
+            synchronized (PlaceLikedRepository.class) {
+                if (placeLikedRepository == null) {
+                    placeLikedRepository = new PlaceLikedRepository();
                 }
             }
         }
-        return restaurantLikedRepository;
+        return placeLikedRepository;
     }
 
     private void addWorkmateSnapShotListener() {//TODO changer de nom.
