@@ -150,8 +150,8 @@ public abstract class GoogleMapBaseFragment extends BaseFragment implements OnMa
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(lastKnowLocation.getLatitude(), lastKnowLocation.getLongitude()), DEFAULT_ZOOM)
             );
-            addMarkers(restaurants);
         }
+        addMarkers(restaurants);
     }
 
     private void moveCameraOnThiSRestaurant(ArrayList<PlaceModel> restaurants) {

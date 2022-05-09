@@ -26,7 +26,6 @@ import com.google.android.libraries.places.widget.Autocomplete;
 import com.google.android.libraries.places.widget.model.AutocompleteActivityMode;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class MainViewModel extends ViewModel {
 
@@ -54,12 +53,12 @@ public class MainViewModel extends ViewModel {
         restaurantLikedUseCase.observeForever(restaurantLikedState -> {
             restaurantLikedList = restaurantLikedState.getRestaurantModelArrayList();
 
+            _state.setValue(new NearRestaurantUpdateState(updateLikedRestaurants(restaurantList)));
         });
 
         nearRestaurantUseCase.observeForever(nearRestaurants -> {
             restaurantList = nearRestaurants.getRestaurantModelArrayList();
-            updateLikedRestaurants(PlaceEntity.updateRestaurantEntity(nearRestaurants.getRestaurantModelArrayList()));
-              _state.setValue(new NearRestaurantUpdateState(nearRestaurants.getCurrentLocation(), nearRestaurants.getRestaurantModelArrayList()));
+            _state.setValue(new NearRestaurantUpdateState(nearRestaurants.getCurrentLocation(), updateLikedRestaurants(nearRestaurants.getRestaurantModelArrayList())));
         });
     }
 
@@ -71,9 +70,6 @@ public class MainViewModel extends ViewModel {
         nearRestaurantUseCase.startService();
     }
 
-    public ArrayList<PlaceModel> getRestaurantList() {
-        return restaurantList;
-    }
 
     public void stopLocationUpdate() {
         nearRestaurantUseCase.stopLocationUpdate();
@@ -95,19 +91,23 @@ public class MainViewModel extends ViewModel {
         autocompleteUseCase.updateRestaurant(placeModel);
     }
 
-    private void updateLikedRestaurants(@NonNull List<PlaceEntity> restaurantList) {
-        for (PlaceEntity placeEntity : restaurantList) {
-            if (restaurantLikedList.contains(placeEntity.getPlaceId() + FirebaseRepository.getUser().getUid())) {
-                placeEntity.setMarkedColor(PlaceModel.MARKET_COLOR_RESTAURANT_LIKED);
+    private ArrayList<PlaceModel> updateLikedRestaurants(@NonNull ArrayList<PlaceModel> restaurantList) {
+        for (PlaceModel placeModel : restaurantList) {
+            if (restaurantLikedList.contains(placeModel.getPlaceId() + FirebaseRepository.getUser().getUid())) {
+                placeModel.setMarkedColor(PlaceModel.MARKET_COLOR_RESTAURANT_LIKED);
             } else {
-                placeEntity.setMarkedColor(PlaceModel.DEFAULT_MARKET_COLOR);
+                placeModel.setMarkedColor(PlaceModel.DEFAULT_MARKET_COLOR);
             }
-
-            // update to local database
-          // update(restaurantEntity);
         }
-    }
 
+        ArrayList<PlaceEntity> placeEntities = PlaceEntity.updateRestaurantEntity(restaurantList);
+
+        for (PlaceEntity placeEntity : placeEntities) {
+            update(placeEntity);
+        }
+
+        return restaurantList;
+    }
 
     public LiveData<LocationEntity> getLastLocationLiveData() {
         return locationRepository.getLastLocationLiveData();

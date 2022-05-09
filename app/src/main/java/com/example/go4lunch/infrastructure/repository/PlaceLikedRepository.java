@@ -15,6 +15,7 @@ public class PlaceLikedRepository extends LiveData<ArrayList<String>> {
 
     private static PlaceLikedRepository placeLikedRepository;
     private static final String RESTAURANT_LIKED = "restaurant_liked";
+    private static final String PLACE_NAME_FIELD = "placeIdLiked";
 
     private CollectionReference getRestaurantLikedCollection() {
         return FirebaseFirestore.getInstance().collection(RESTAURANT_LIKED);
@@ -75,7 +76,7 @@ public class PlaceLikedRepository extends LiveData<ArrayList<String>> {
 
     public void getRestaurantsLiked(String placeId) {
         getRestaurantLikedCollection()
-                .whereEqualTo("placeIdLiked", placeId)
+                .whereEqualTo(PLACE_NAME_FIELD, placeId)
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
@@ -85,6 +86,16 @@ public class PlaceLikedRepository extends LiveData<ArrayList<String>> {
                         }
 
                         setValue(restaurantLiked);
+                    }
+                });
+    }
+
+    public void getListPlaceLiked(){
+        getRestaurantLikedCollection()
+               .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
                     }
                 });
     }
