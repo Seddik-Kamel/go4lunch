@@ -8,7 +8,6 @@ import com.example.go4lunch.infrastructure.entity.PlaceEntity;
 import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
 import com.example.go4lunch.model.FavoriteRestaurantModel;
-import com.example.go4lunch.model.WorkmateModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
 import com.example.go4lunch.state.RestaurantLikedState;
 import com.example.go4lunch.state.WorkMatesUpdateState;
@@ -53,9 +52,7 @@ public class RestaurantDetailViewModel extends ViewModel {
     }
 
     public void onLoadViewLikedPlace() {
-        restaurantLikedUseCase.observeForever(restaurantLikedState -> {
-            _likedRestaurantState.setValue(new RestaurantLikedState(restaurantLikedState.getRestaurantModelArrayList()));
-        });
+        restaurantLikedUseCase.observeForever(restaurantLikedState -> _likedRestaurantState.setValue(new RestaurantLikedState(restaurantLikedState.getRestaurantModelArrayList())));
     }
 
     public LiveData<PlaceEntity> getRestaurant(String placeId) {
@@ -78,10 +75,6 @@ public class RestaurantDetailViewModel extends ViewModel {
         workMatesUseCase.listenWorkmateWhoLikePlace(placeId);
     }
 
-    public void persistWorkmateLikedRestaurant(String placeId) {
-        this.workMatesUseCase.persistWorkmateLikedRestaurant(placeId);
-    }
-
     public void deleteUserWhoLikedRestaurant(String userUID) {
         workMatesUseCase.deleteUserWhoLikedRestaurant(userUID);
     }
@@ -92,19 +85,6 @@ public class RestaurantDetailViewModel extends ViewModel {
 
     public void deleteRestaurantLiked(String placeId) {
         restaurantLikedUseCase.deleteRestaurantLiked(placeId);
-    }
-
-    public void getRestaurantsLiked(String placeId) {
-        restaurantLikedUseCase.getRestaurantsLiked(placeId);
-    }
-
-    public boolean hasLikedThisRestaurant(ArrayList<WorkmateModel> workmateList) {
-        String currentUserId = FirebaseRepository.getCurrentUserUID();
-        boolean isLikedRestaurant = false;
-        for (WorkmateModel workmateModel : workmateList) {
-            isLikedRestaurant = workmateModel.getUserUid().equals(currentUserId);
-        }
-        return isLikedRestaurant;
     }
 
     public boolean hasAFavoriteRestaurant(ArrayList<FavoriteRestaurantModel> favoriteRestaurantModelArrayList, String placeId) {
@@ -120,18 +100,53 @@ public class RestaurantDetailViewModel extends ViewModel {
         return isFavoriteRestaurant;
     }
 
-    public boolean restaurantHasLiked(ArrayList<String> restaurantModelArrayList, String placeId) {
+    public boolean placeHasLiked(ArrayList<String> listDocumentId, String placeId) {
         String userId = FirebaseRepository.getCurrentUserUID();
         String uid = placeId + userId;
-        boolean isLiked = false;
+        boolean placeHasLikedByUser = false;
 
-        for (String id : restaurantModelArrayList) {
-            if (id.equals(uid)) {
-                isLiked = true;
+        for (String documentId : listDocumentId) {
+            if (documentId.equals(uid)) {
+                placeHasLikedByUser = true;
                 break;
             }
         }
 
-        return isLiked;
+        return placeHasLikedByUser;
+    }
+
+    public boolean userHasLikedAnotherPlace(ArrayList<String> listDocumentId) {
+        String currentUserId = FirebaseRepository.getCurrentUserUID();
+        boolean userHasLikedPlace = false;
+
+        if (currentUserId != null) {
+            for (String documentId : listDocumentId) {
+                int beginIndex = documentId.length() - currentUserId.length();
+                String userId = documentId.substring(beginIndex);
+                if (currentUserId.equals(userId)) {
+                    userHasLikedPlace = true;
+                    break;
+                }
+            }
+        }
+
+        return userHasLikedPlace;
+    }
+
+    public String getDocumentIdOfPlaceLiked(ArrayList<String> listDocumentId) {
+        String currentUserId = FirebaseRepository.getCurrentUserUID();
+        String placeIdOfPlaceLiked = "";
+        if (currentUserId != null) {
+            for (String documentId : listDocumentId) {
+                int beginIndex = documentId.length() - currentUserId.length();
+
+                String userId = documentId.substring(beginIndex);
+                if (currentUserId.equals(userId)) {
+                    placeIdOfPlaceLiked = documentId.substring(0, beginIndex);
+                    break;
+                }
+            }
+        }
+        return placeIdOfPlaceLiked;
     }
 }

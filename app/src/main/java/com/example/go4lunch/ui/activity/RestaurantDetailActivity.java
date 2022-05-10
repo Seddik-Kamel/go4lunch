@@ -40,7 +40,9 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     private String placeId;
     private String phoneNumber;
     private RestaurantDetailViewModel restaurantDetailViewModel;
-    private boolean isLiked;
+    private boolean placeHasLikedByUser;
+    private boolean userHasLikedAnotherPlace;
+    private String placeIdLiked;
 
 
     public interface AlertDialogInterface {
@@ -61,7 +63,6 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         placeId = getIntent().getStringExtra("placeId");
-       // placeId = "ChIJhbeFtlPIlkcR83m5lfVPwB0";
         initViewModel();
         initObservers();
         likePlace();
@@ -77,12 +78,16 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         restaurantDetailViewModel.getRestaurant(placeId).observe(this, this::placeRender);
         restaurantDetailViewModel.updateFavoriteRestaurantListener(placeId);
         restaurantDetailViewModel.favoriteRestaurantState.observe(this, this::favoritePlaceRender);
-        restaurantDetailViewModel.likedRestaurantState.observe(this, this::likedRestaurantRender);
+        restaurantDetailViewModel.likedRestaurantState.observe(this, this::likedPlaceRender);
     }
 
-    private void likedRestaurantRender(RestaurantLikedState restaurantLikedState) {
-        if (placeId != null)
-            isLiked = restaurantDetailViewModel.restaurantHasLiked(restaurantLikedState.getRestaurantModelArrayList(), placeId);
+    private void likedPlaceRender(RestaurantLikedState restaurantLikedState) {
+        if (placeId != null) {
+            placeHasLikedByUser = restaurantDetailViewModel.placeHasLiked(restaurantLikedState.getRestaurantModelArrayList(), placeId);
+            userHasLikedAnotherPlace = restaurantDetailViewModel.userHasLikedAnotherPlace(restaurantLikedState.getRestaurantModelArrayList());
+            placeIdLiked = restaurantDetailViewModel.getDocumentIdOfPlaceLiked(restaurantLikedState.getRestaurantModelArrayList());
+            manageLikeFab(placeHasLikedByUser);
+        }
     }
 
 
@@ -99,10 +104,10 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         }
     }
 
-    private void placeRender(PlaceEntity placeEntity) {// from local database.
+    private void placeRender(PlaceEntity placeEntity) {// from locale database.
         if (placeEntity != null) {
             binding.restaurantName.setText(placeEntity.getName());
-            binding.restaurantAddress.setText(placeEntity.getAddress());
+            binding.restaurantAddress.setText(placeEntity.getPlaceId());
             binding.restaurantRatingBar.setRating(placeEntity.getRating());
             loadImageInView(placeEntity);
 
@@ -129,8 +134,6 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
     private void workmateRender(@NonNull WorkMatesUpdateState workMatesUpdateState) {
         initRecyclerView(workMatesUpdateState.getWorkmateModelArrayList());
-        boolean hasLikedThisRestaurant = restaurantDetailViewModel.hasLikedThisRestaurant(workMatesUpdateState.getWorkmateModelArrayList());
-        manageLikeFab(hasLikedThisRestaurant);
     }
 
     private void disLikePlace() {
@@ -148,16 +151,15 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
     private void likePlace() {
         binding.floatingActionButtonLike.setOnClickListener(click -> {
-            if (isLiked) {
+            if (placeHasLikedByUser || userHasLikedAnotherPlace) {
                 String title = getResources().getString(R.string.alert_dialog_title);
                 String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
                 showAlertDialog(() -> {
                     displayDisLikeButton();
-                    restaurantDetailViewModel.persistWorkmateLikedRestaurant(placeId);
                     restaurantDetailViewModel.saveRestaurantsLiked(placeId);
+                    restaurantDetailViewModel.deleteRestaurantLiked(placeIdLiked);
                 }, title, message);
             } else {
-                restaurantDetailViewModel.persistWorkmateLikedRestaurant(placeId);
                 restaurantDetailViewModel.saveRestaurantsLiked(placeId);
                 displayDisLikeButton();
             }
