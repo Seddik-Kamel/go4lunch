@@ -22,7 +22,6 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityDetailsRestaurantsBinding;
 import com.example.go4lunch.infrastructure.entity.PlaceEntity;
-import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.model.WorkmateModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
 import com.example.go4lunch.state.RestaurantLikedState;
@@ -142,7 +141,6 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
             String message = getResources().getString(R.string.alert_dialog_restaurant_detail_dislike_message);
             showAlertDialog(() -> {
                 displayLikeButton();
-                restaurantDetailViewModel.deleteUserWhoLikedRestaurant(FirebaseRepository.getCurrentUserUID());
                 restaurantDetailViewModel.deleteRestaurantLiked(placeId);
 
             }, title, message);

@@ -75,10 +75,6 @@ public class RestaurantDetailViewModel extends ViewModel {
         workMatesUseCase.listenWorkmateWhoLikePlace(placeId);
     }
 
-    public void deleteUserWhoLikedRestaurant(String userUID) {
-        workMatesUseCase.deleteUserWhoLikedRestaurant(userUID);
-    }
-
     public void saveRestaurantsLiked(String placeId) {
         this.restaurantLikedUseCase.saveRestaurantsLiked(placeId);
     }
