@@ -34,7 +34,7 @@ public class LocationEntity {
         lastLocation.setLatitude(latitude);
         float distance = lastLocation.distanceTo(currentLocation);
 
-        return distance > 0.1;
+        return distance > 5;
     }
 
     public Integer getId() {

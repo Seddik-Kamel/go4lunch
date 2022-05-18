@@ -40,6 +40,14 @@ public class WorkmateModel {
         this.userName = userName;
     }
 
+    public String getPlaceIdLiked() {
+        return placeIdLiked;
+    }
+
+    public void setPlaceIdLiked(String placeIdLiked) {
+        this.placeIdLiked = placeIdLiked;
+    }
+
     @Nullable
     public String getUrlPicture() {
         return urlPicture;
@@ -47,13 +55,5 @@ public class WorkmateModel {
 
     public void setUrlPicture(@Nullable String urlPicture) {
         this.urlPicture = urlPicture;
-    }
-
-    public String getPlaceIdLiked() {
-        return placeIdLiked;
-    }
-
-    public void setPlaceIdLiked(String placeIdLiked) {
-        this.placeIdLiked = placeIdLiked;
     }
 }

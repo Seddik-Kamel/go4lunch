@@ -22,6 +22,7 @@ import com.bumptech.glide.Glide;
 import com.example.go4lunch.R;
 import com.example.go4lunch.databinding.ActivityDetailsRestaurantsBinding;
 import com.example.go4lunch.infrastructure.entity.PlaceEntity;
+import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.model.WorkmateModel;
 import com.example.go4lunch.state.FavoriteRestaurantState;
 import com.example.go4lunch.state.RestaurantLikedState;
@@ -42,6 +43,7 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
     private boolean placeHasLikedByUser;
     private boolean userHasLikedAnotherPlace;
     private String placeIdLiked;
+    private PlaceEntity placeEntity;
 
 
     public interface AlertDialogInterface {
@@ -70,7 +72,7 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
     private void initObservers() {
         restaurantDetailViewModel.listenWorkmateWhoLikePlace(placeId);
-        restaurantDetailViewModel.state.observe(this, this::workmateRender);
+        restaurantDetailViewModel.workmateState.observe(this, this::workmateRender);
         restaurantDetailViewModel.onLoadView();
         restaurantDetailViewModel.onLoadViewFavoritePlace();
         restaurantDetailViewModel.onLoadViewLikedPlace();
@@ -89,7 +91,6 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
         }
     }
 
-
     private void favoritePlaceRender(@NonNull FavoriteRestaurantState favoriteRestaurantState) {
         if (restaurantDetailViewModel.hasAFavoriteRestaurant(favoriteRestaurantState.getFavoriteRestaurantModel(), placeId)) {
             binding.actionNoStar.setVisibility(View.GONE);
@@ -105,8 +106,11 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
 
     private void placeRender(PlaceEntity placeEntity) {// from locale database.
         if (placeEntity != null) {
+
+            this.placeEntity = placeEntity;
+
             binding.restaurantName.setText(placeEntity.getName());
-            binding.restaurantAddress.setText(placeEntity.getPlaceId());
+            binding.restaurantAddress.setText(placeEntity.getAddress());
             binding.restaurantRatingBar.setRating(placeEntity.getRating());
             loadImageInView(placeEntity);
 
@@ -142,6 +146,7 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
             showAlertDialog(() -> {
                 displayLikeButton();
                 restaurantDetailViewModel.deleteRestaurantLiked(placeId);
+                restaurantDetailViewModel.deleteWorkmateLikedRestaurant(FirebaseRepository.getCurrentUserUID());
 
             }, title, message);
         });
@@ -154,11 +159,13 @@ public class RestaurantDetailActivity extends BaseActivity<ActivityDetailsRestau
                 String message = getResources().getString(R.string.alert_dialog_restaurant_detail_like_message);
                 showAlertDialog(() -> {
                     displayDisLikeButton();
-                    restaurantDetailViewModel.saveRestaurantsLiked(placeId);
+                    restaurantDetailViewModel.saveRestaurantsLiked(placeEntity);
                     restaurantDetailViewModel.deleteRestaurantLiked(placeIdLiked);
+                    restaurantDetailViewModel.saveWorkmateLikedRestaurant(placeId);// TODO à corriger.
                 }, title, message);
             } else {
-                restaurantDetailViewModel.saveRestaurantsLiked(placeId);
+                restaurantDetailViewModel.saveRestaurantsLiked(placeEntity);
+                restaurantDetailViewModel.saveWorkmateLikedRestaurant(placeId);
                 displayDisLikeButton();
             }
         });

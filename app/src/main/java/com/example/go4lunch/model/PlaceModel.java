@@ -1,6 +1,7 @@
 package com.example.go4lunch.model;
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
@@ -14,6 +15,7 @@ public class PlaceModel {
 
     private long id;
     private String placeId;
+    private String currentUser;
     private String name;
     public double latitude;
     public double longitude;
@@ -151,7 +153,11 @@ public class PlaceModel {
     }
 
     public Bitmap getBitmap() {
-        return bitmap;
+        if (bitmap == null) {
+            return BitmapFactory.decodeByteArray(bytesImage, 0, bytesImage.length);
+        } else {
+            return bitmap;
+        }
     }
 
     public void setBitmap(Bitmap bitmap) {
@@ -204,5 +210,13 @@ public class PlaceModel {
 
     public void setBytesImage(byte[] bytesImage) {
         this.bytesImage = bytesImage;
+    }
+
+    public String getCurrentUser() {
+        return currentUser;
+    }
+
+    public void setCurrentUser(String currentUser) {
+        this.currentUser = currentUser;
     }
 }

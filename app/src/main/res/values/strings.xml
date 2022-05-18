@@ -14,8 +14,8 @@
     <string name="item_stars">stars</string>
     <string name="item_people">item peoples</string>
     <string name="details_restaurant_fragment">" Restaurant  Details"</string>
-    <string name="place_open" >Open</string>
-    <string name="place_close" >Closed</string>
+    <string name="place_open">Open</string>
+    <string name="place_close">Closed</string>
     <string name="unknown_information">U.W</string>
     <string name="description_like_button">Like button</string>
     <string name="alert_dialog_title">Warning</string>
@@ -31,5 +31,15 @@
     <string name="login_canceled">login canceled</string>
     <string name="no_connection">No connection</string>
     <string name="unknow_error">unknow error</string>
+    <string name="no_place_liked">No place liked</string>
+
+
+    <!-- Facebook auth -->
+    <string name="facebook_application_id" translatable="false">410539103953344</string>
+    <string name="fb_login_protocol_scheme" translatable="false">fb410539103953344</string>
+    <string name="facebook_client_token" translatable="false">2e4acd66d4a9940dd83280c75616067f</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_notification_switch">Notifications</string>
+
 
 </resources>

@@ -11,13 +11,13 @@ import androidx.lifecycle.ViewModel;
 
 import com.example.go4lunch.infrastructure.entity.LocationEntity;
 import com.example.go4lunch.infrastructure.entity.PlaceEntity;
-import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.infrastructure.repository.LocationRepository;
 import com.example.go4lunch.infrastructure.repository.PlaceRepository;
 import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
 import com.example.go4lunch.state.NearRestaurantUpdateState;
+import com.example.go4lunch.state.RestaurantLikedState;
 import com.example.go4lunch.usecase.AutocompleteUseCase;
 import com.example.go4lunch.usecase.NearRestaurantUseCase;
 import com.example.go4lunch.usecase.RestaurantLikedUseCase;
@@ -30,7 +30,7 @@ import java.util.ArrayList;
 public class MainViewModel extends ViewModel {
 
     private ArrayList<PlaceModel> restaurantList = new ArrayList<>();
-    private ArrayList<String> restaurantLikedList = new ArrayList<>();
+    private ArrayList<PlaceEntity> restaurantLikedList = new ArrayList<>();
     public final NearRestaurantUseCase nearRestaurantUseCase;
     public final AutocompleteUseCase autocompleteUseCase;
     public final RestaurantLikedUseCase restaurantLikedUseCase;
@@ -39,6 +39,10 @@ public class MainViewModel extends ViewModel {
 
     private final MutableLiveData<MainPageState> _state = new MutableLiveData<>();
     public final LiveData<MainPageState> state = _state;
+
+    private final MutableLiveData<RestaurantLikedState> _likedRestaurantState = new MutableLiveData<>();
+    public final LiveData<RestaurantLikedState> likedRestaurantState = _likedRestaurantState;
+
 
     public MainViewModel(NearRestaurantUseCase nearRestaurantUseCase, RestaurantLikedUseCase restaurantLikedUseCase,
                          AutocompleteUseCase autocompleteUseCase, LocationRepository locationRepository, PlaceRepository placeRepository) {
@@ -64,6 +68,10 @@ public class MainViewModel extends ViewModel {
 
     public void onLoadAutoComplete() {
         autocompleteUseCase.observeForever(autocomplete -> _state.setValue(new AutocompleteState(autocomplete.getRestaurantModelArrayList())));
+    }
+
+    public void onLoadViewLikedPlace() {
+        restaurantLikedUseCase.observeForever(restaurantLikedState -> _likedRestaurantState.setValue(new RestaurantLikedState(restaurantLikedState.getRestaurantModelArrayList())));
     }
 
     public void onLocationPermissionsAccepted() {
@@ -92,21 +100,31 @@ public class MainViewModel extends ViewModel {
     }
 
     private ArrayList<PlaceModel> updateLikedRestaurants(@NonNull ArrayList<PlaceModel> restaurantList) {
-        for (PlaceModel placeModel : restaurantList) {
-            if (restaurantLikedList.contains(placeModel.getPlaceId() + FirebaseRepository.getUser().getUid())) {
-                placeModel.setMarkedColor(PlaceModel.MARKET_COLOR_RESTAURANT_LIKED);
-            } else {
+
+        if (restaurantLikedList.isEmpty()) {
+            for (PlaceModel placeModel : restaurantList) {
                 placeModel.setMarkedColor(PlaceModel.DEFAULT_MARKET_COLOR);
+            }
+        } else {
+            String placeIdLiked = restaurantLikedList.get(0).getPlaceId();
+            for (PlaceModel placeModel : restaurantList) {
+                if (placeIdLiked.equals(placeModel.getPlaceId())) {
+                    placeModel.setMarkedColor(PlaceModel.MARKET_COLOR_RESTAURANT_LIKED);
+                } else {
+                    placeModel.setMarkedColor(PlaceModel.DEFAULT_MARKET_COLOR);
+                }
+            }
+
+            ArrayList<PlaceEntity> placeEntities = PlaceEntity.updateRestaurantEntity(restaurantList);
+
+            for (PlaceEntity placeEntity : placeEntities) {
+                update(placeEntity);
             }
         }
 
-        ArrayList<PlaceEntity> placeEntities = PlaceEntity.updateRestaurantEntity(restaurantList);
-
-        for (PlaceEntity placeEntity : placeEntities) {
-            update(placeEntity);
-        }
 
         return restaurantList;
+
     }
 
     public LiveData<LocationEntity> getLastLocationLiveData() {

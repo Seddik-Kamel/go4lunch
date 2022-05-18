@@ -16,6 +16,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.GravityCompat;
 import androidx.fragment.app.Fragment;
 
@@ -27,6 +28,7 @@ import com.example.go4lunch.infrastructure.repository.FirebaseRepository;
 import com.example.go4lunch.model.PlaceModel;
 import com.example.go4lunch.state.AutocompleteState;
 import com.example.go4lunch.state.MainPageState;
+import com.example.go4lunch.state.RestaurantLikedState;
 import com.example.go4lunch.ui.fragments.ListViewRestaurantsFragment;
 import com.example.go4lunch.ui.fragments.MapViewFragment;
 import com.example.go4lunch.ui.fragments.WorkmatesListFragment;
@@ -63,7 +65,9 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
 
         mainViewModel = ViewModelFactory.getInstance(this, getActivity().getApplication()).obtainViewModel(MainViewModel.class);
         mainViewModel.onLoadView();
+        mainViewModel.onLoadViewLikedPlace();
         mainViewModel.state.observe(this, this::render);
+        mainViewModel.likedRestaurantState.observe(this, this::likedPlaceRender);
 
         displayFragment(savedInstanceState, MapViewFragment.newInstance(isLocationPermissionGranted()));
         configureToolBar();
@@ -81,9 +85,10 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
         TextView textView = headerView.findViewById(R.id.nav_header_user_name);
         TextView textViewMail = headerView.findViewById(R.id.nav_header_user_mail);
         ImageView imageView = headerView.findViewById(R.id.nav_header_user_photo);
+
+        //Set text
         textView.setText(userName);
         textViewMail.setText(userEmail);
-
         Glide.with(this)
                 .load(userPhotoUrl)
                 .apply(RequestOptions.circleCropTransform())
@@ -93,6 +98,17 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
     private void render(MainPageState mainPageState) {
         if (mainPageState instanceof AutocompleteState) {
             autocompleteLaunch.launch(((AutocompleteState) mainPageState).getIntent());
+        }
+    }
+
+    private void likedPlaceRender(RestaurantLikedState restaurantLikedState) {
+        Menu menu = binding.navigationView.getMenu();
+        MenuItem textView = menu.findItem(R.id.activity_main_item);
+
+        if (restaurantLikedState.getRestaurantModelArrayList().isEmpty()) {
+            textView.setTitle(getActivity().getResources().getString(R.string.no_place_liked));
+        } else {
+            textView.setTitle(restaurantLikedState.getRestaurantModelArrayList().get(0).getName());
         }
     }
 
@@ -133,6 +149,9 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
         int id = item.getItemId();
         if (id == R.id.activity_main_drawer_logout) {
             signOutCurrentUser();
+        }
+        if (id == R.id.activity_main_drawer_profile) {
+            startActivity(SettingsActivity.class);
         }
         binding.activityMainDrawerLayout.closeDrawer(GravityCompat.START);
 
@@ -178,6 +197,11 @@ public class HomeScreenActivity extends PermissionBaseActivity implements Naviga
 
     public void startLoginActivity() {
         Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
+    }
+
+    public void startActivity(Class<? extends AppCompatActivity> activity) {
+        Intent intent = new Intent(this, activity);
         startActivity(intent);
     }
 

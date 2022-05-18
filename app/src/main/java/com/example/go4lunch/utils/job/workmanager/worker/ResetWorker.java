@@ -13,7 +13,6 @@ import com.google.common.util.concurrent.ListenableFuture;
 
 public class ResetWorker extends ListenableWorker {
     private final WorkmateRepository workmateRepository;
-
     private final WorkerManager workerManager;
 
     public ResetWorker(@NonNull Context context, @NonNull WorkerParameters params) {

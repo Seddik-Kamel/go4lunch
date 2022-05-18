@@ -7,5 +7,4 @@ public class LocationEvent {
     public LocationEvent(boolean locationPermissionGranted) {
         this.locationPermissionGranted = locationPermissionGranted;
     }
-
 }

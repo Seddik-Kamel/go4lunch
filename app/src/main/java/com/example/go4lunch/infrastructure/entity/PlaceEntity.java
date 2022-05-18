@@ -20,6 +20,7 @@ public class PlaceEntity {
     @PrimaryKey
     @NonNull
     private String placeId;
+    private String currentUserID;
     @ColumnInfo(typeAffinity = ColumnInfo.BLOB)
     private byte[] image;
     private String name;
@@ -35,6 +36,10 @@ public class PlaceEntity {
     private boolean isLiked;
     private float markedColor;
 
+
+    /**
+     * Constructor needed for Firebase to convert to object (toObject)
+     */
 
     public PlaceEntity() {
 
@@ -80,6 +85,7 @@ public class PlaceEntity {
             placeModel.setMarkedColor(placeEntity.markedColor);
             placeModel.setLiked(placeEntity.isLiked());
             placeModel.setBytesImage(placeEntity.getImage());
+            placeModel.setCurrentUser(placeEntity.getCurrentUserID());
 
             placeModels.add(placeModel);
         }
@@ -107,6 +113,7 @@ public class PlaceEntity {
             placeEntity.setMarkedColor(placeModel.getMarkedColor());
             placeEntity.setLiked(placeModel.isLiked());
             placeEntity.setImage(placeModel.getBytesImage());
+            placeEntity.setCurrentUserID(placeEntity.getCurrentUserID());
 
             restaurantEntities.add(placeEntity);
         }
@@ -232,6 +239,14 @@ public class PlaceEntity {
 
     public void setMarkedColor(float markedColor) {
         this.markedColor = markedColor;
+    }
+
+    public String getCurrentUserID() {
+        return currentUserID;
+    }
+
+    public void setCurrentUserID(String currentUserID) {
+        this.currentUserID = currentUserID;
     }
 }
 

@@ -18,17 +18,19 @@ public class AuthenticationViewModel extends ViewModel {
 
         List<AuthUI.IdpConfig> providers = Arrays.asList(
                 new AuthUI.IdpConfig.GoogleBuilder().build(),
-                new AuthUI.IdpConfig.EmailBuilder().build()
+                new AuthUI.IdpConfig.EmailBuilder().build(),
+                new AuthUI.IdpConfig.FacebookBuilder().build(),
+                new AuthUI.IdpConfig.TwitterBuilder().build(),
+                new AuthUI.IdpConfig.PhoneBuilder().build()
         );
 
         return FirebaseRepository.getAuthUi()
                 .createSignInIntentBuilder()
                 .setAvailableProviders(providers)
                 .setTheme(R.style.AppTheme_NoTitle)
-                /*.setIsSmartLockEnabled(false)*/
+                .setIsSmartLockEnabled(false)
                 .build();
     }
-
 
     public FirebaseUser getCurrentUser() {
         return FirebaseRepository.getAuth().getCurrentUser();

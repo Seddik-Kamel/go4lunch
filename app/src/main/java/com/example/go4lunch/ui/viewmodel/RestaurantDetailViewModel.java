@@ -24,14 +24,15 @@ public class RestaurantDetailViewModel extends ViewModel {
     private final WorkMatesUseCase workMatesUseCase;
     private final RestaurantLikedUseCase restaurantLikedUseCase;
 
-    private final MutableLiveData<WorkMatesUpdateState> _state = new MutableLiveData<>();
-    public final LiveData<WorkMatesUpdateState> state = _state;
+    private final MutableLiveData<WorkMatesUpdateState> _workmateState = new MutableLiveData<>();
+    public final LiveData<WorkMatesUpdateState> workmateState = _workmateState;
     private final MutableLiveData<FavoriteRestaurantState> _favoriteRestaurantState = new MutableLiveData<>();
     public final LiveData<FavoriteRestaurantState> favoriteRestaurantState = _favoriteRestaurantState;
     private final MutableLiveData<RestaurantLikedState> _likedRestaurantState = new MutableLiveData<>();
     public final LiveData<RestaurantLikedState> likedRestaurantState = _likedRestaurantState;
 
     public RestaurantDetailViewModel(
+
             FavoriteRestaurantUseCase favoriteRestaurantUseCase,
             WorkMatesUseCase workMatesUseCase,
             RestaurantLikedUseCase restaurantLikedUseCase,
@@ -44,7 +45,7 @@ public class RestaurantDetailViewModel extends ViewModel {
     }
 
     public void onLoadView() {
-        workMatesUseCase.observeForever(workMatesUpdateState -> _state.setValue(new WorkMatesUpdateState(workMatesUpdateState.getWorkmateModelArrayList())));
+        workMatesUseCase.observeForever(workMatesUpdateState -> _workmateState.setValue(new WorkMatesUpdateState(workMatesUpdateState.getWorkmateModelArrayList())));
     }
 
     public void onLoadViewFavoritePlace() {
@@ -75,8 +76,16 @@ public class RestaurantDetailViewModel extends ViewModel {
         workMatesUseCase.listenWorkmateWhoLikePlace(placeId);
     }
 
-    public void saveRestaurantsLiked(String placeId) {
-        this.restaurantLikedUseCase.saveRestaurantsLiked(placeId);
+    public void saveWorkmateLikedRestaurant(String placeId) {
+        workMatesUseCase.saveWorkmateLikedRestaurant(placeId);
+    }
+
+    public void deleteWorkmateLikedRestaurant(String userUID) {
+        workMatesUseCase.deleteUserWhoLikedRestaurant(userUID);
+    }
+
+    public void saveRestaurantsLiked(PlaceEntity placeEntity) {
+        this.restaurantLikedUseCase.saveRestaurantsLiked(placeEntity);
     }
 
     public void deleteRestaurantLiked(String placeId) {
@@ -96,13 +105,12 @@ public class RestaurantDetailViewModel extends ViewModel {
         return isFavoriteRestaurant;
     }
 
-    public boolean placeHasLiked(ArrayList<String> listDocumentId, String placeId) {
+    public boolean placeHasLiked(ArrayList<PlaceEntity> listDocumentId, String placeId) {
         String userId = FirebaseRepository.getCurrentUserUID();
-        String uid = placeId + userId;
         boolean placeHasLikedByUser = false;
 
-        for (String documentId : listDocumentId) {
-            if (documentId.equals(uid)) {
+        for (PlaceEntity placeEntity : listDocumentId) {
+            if (placeEntity.getPlaceId().equals(placeId) && placeEntity.getCurrentUserID().equals(userId)) {
                 placeHasLikedByUser = true;
                 break;
             }
@@ -111,14 +119,13 @@ public class RestaurantDetailViewModel extends ViewModel {
         return placeHasLikedByUser;
     }
 
-    public boolean userHasLikedAnotherPlace(ArrayList<String> listDocumentId) {
+    public boolean userHasLikedAnotherPlace(ArrayList<PlaceEntity> listDocumentId) {
         String currentUserId = FirebaseRepository.getCurrentUserUID();
         boolean userHasLikedPlace = false;
 
         if (currentUserId != null) {
-            for (String documentId : listDocumentId) {
-                int beginIndex = documentId.length() - currentUserId.length();
-                String userId = documentId.substring(beginIndex);
+            for (PlaceEntity placeEntity : listDocumentId) {
+                String userId = placeEntity.getCurrentUserID();
                 if (currentUserId.equals(userId)) {
                     userHasLikedPlace = true;
                     break;
@@ -129,16 +136,15 @@ public class RestaurantDetailViewModel extends ViewModel {
         return userHasLikedPlace;
     }
 
-    public String getDocumentIdOfPlaceLiked(ArrayList<String> listDocumentId) {
+    public String getDocumentIdOfPlaceLiked(ArrayList<PlaceEntity> listDocumentId) {
         String currentUserId = FirebaseRepository.getCurrentUserUID();
         String placeIdOfPlaceLiked = "";
         if (currentUserId != null) {
-            for (String documentId : listDocumentId) {
-                int beginIndex = documentId.length() - currentUserId.length();
+            for (PlaceEntity placeEntity : listDocumentId) {
 
-                String userId = documentId.substring(beginIndex);
+                String userId = placeEntity.getCurrentUserID();
                 if (currentUserId.equals(userId)) {
-                    placeIdOfPlaceLiked = documentId.substring(0, beginIndex);
+                    placeIdOfPlaceLiked = placeEntity.getPlaceId();
                     break;
                 }
             }

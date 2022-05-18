@@ -2,14 +2,12 @@ package com.example.go4lunch.utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.location.Location;
-
-import com.google.android.gms.maps.model.LatLng;
 
 public class Preferences {
 
     public static final String MY_PREF = "goLunch";
     public static final String HAS_LIKED_RESTAURANT = "hasLikedRestaurant";
+    public static final String NOTIFICATION_ENABLE = "notificationEnable";
 
     private final SharedPreferences sharedPreferences;
     private final SharedPreferences.Editor editor;
@@ -33,11 +31,9 @@ public class Preferences {
         this.editor.commit();
     }
 
-
     public boolean getBoolean(String key) {
         return this.sharedPreferences.getBoolean(key, false);
     }
-
 
     public void clear(String key) {
         this.editor.remove(key);

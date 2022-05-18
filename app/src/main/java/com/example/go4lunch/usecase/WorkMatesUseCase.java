@@ -49,7 +49,7 @@ public class WorkMatesUseCase extends MediatorLiveData<WorkMatesUpdateState> {
         workmateRepository.listenWorkmate();
     }
 
-    public void persistWorkmateLikedRestaurant(String placeId) {
+    public void saveWorkmateLikedRestaurant(String placeId) {
         workmateRepository.saveWorkmateWhoLikedRestaurant(placeId);
     }
 

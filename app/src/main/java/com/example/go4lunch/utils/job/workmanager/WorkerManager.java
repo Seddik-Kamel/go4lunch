@@ -6,6 +6,7 @@ import androidx.work.ExistingWorkPolicy;
 import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkManager;
 
+import com.example.go4lunch.utils.job.workmanager.worker.NotificationWorker;
 import com.example.go4lunch.utils.job.workmanager.worker.ResetWorker;
 
 import java.time.LocalDate;
@@ -32,7 +33,7 @@ public class WorkerManager {
         return workerManager;
     }
 
-    /*public void enqueueNotificationJobs(Context context) {
+    public void enqueueNotificationJobs(Context context) {
 
         OneTimeWorkRequest oneTimeWorkRequest = new OneTimeWorkRequest.Builder(NotificationWorker.class)
                 .setInitialDelay(computeDelayBeforeNotificationCheck(), TimeUnit.MINUTES)
@@ -41,7 +42,7 @@ public class WorkerManager {
 
         WorkManager.getInstance(context)
                 .enqueueUniqueWork(WORKER_NOTIFICATION, ExistingWorkPolicy.REPLACE, oneTimeWorkRequest);
-    }*/
+    }
 
 
     public void enqueueResetJob(Context context) {
@@ -62,6 +63,13 @@ public class WorkerManager {
     }
 
     private long computeDelayBeforeNotificationCheck() {
-        return 0;
+        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime localNoonDateTime = LocalDateTime.of(LocalDate.now(), LocalTime.NOON);
+
+        if (currentDateTime.isBefore(localNoonDateTime)) {
+            return ChronoUnit.MINUTES.between(currentDateTime, localNoonDateTime);
+        } else {
+            return ChronoUnit.MINUTES.between(currentDateTime, localNoonDateTime.plusDays(1).minusHours(1));
+        }
     }
 }

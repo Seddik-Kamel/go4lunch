@@ -181,15 +181,17 @@ public class PlaceRepository extends LiveData<ArrayList<PlaceModel>> {
         }
     }
 
-    protected void updateRestaurantWithPlaceResponse(PlaceModel restaurant, FetchPlaceResponse placeResponse) {
+    protected void updateRestaurantWithPlaceResponse(PlaceModel placeModel, FetchPlaceResponse placeResponse) {
         Place place = placeResponse.getPlace();
-        restaurant.setWebSitUrl(place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null);
-        restaurant.setPhoneNumber(place.getPhoneNumber());
+        placeModel.setWebSitUrl(place.getWebsiteUri() != null ? place.getWebsiteUri().toString() : null);
+        placeModel.setPhoneNumber(place.getPhoneNumber());
         final String unknownInformation = context.getString(R.string.unknown_information);
-        restaurant.setIsOpen(place.isOpen() != null ? place.isOpen() ? context.getString(R.string.place_open) : context.getString(R.string.place_close) : unknownInformation);
+        placeModel.setIsOpen(place.isOpen() != null ? place.isOpen() ? context.getString(R.string.place_open) : context.getString(R.string.place_close) : unknownInformation);
+        String currentUserId = FirebaseRepository.getCurrentUserUID();
+        placeModel.setCurrentUser(currentUserId);
 
        //Insert to local database
-        PlaceEntity placeEntity = PlaceEntity.updateData(restaurant);
+        PlaceEntity placeEntity = PlaceEntity.updateData(placeModel);
         insert(placeEntity);
     }
 
